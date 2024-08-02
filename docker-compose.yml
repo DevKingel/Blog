@@ -1,0 +1,77 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app-network
+    ports:
+      - "3000:8000"
+
+  backend:
+    build:
+      context: ./backend
+      args:
+        - APP_USER=${APP_USER}
+        - APP_USER_UID=${APP_USER_UID}
+        - APP_GROUP=${APP_GROUP}
+        - APP_GROUP_UID=${APP_GROUP_UID}
+    container_name: backend
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+    networks:
+      - app-network
+
+  nginx:
+    build:
+      context: ./
+      args:
+        - APP_USER=${APP_USER}
+        - APP_USER_UID=${APP_USER_UID}
+        - APP_GROUP=${APP_GROUP}
+        - APP_GROUP_UID=${APP_GROUP_UID}
+    container_name: nginx
+    working_dir: /var/www
+    volumes:
+    #   - ./frontend/.next:/usr/share/nginx/html
+      - ./backend:/var/www
+    ports:
+      - "80:80"
+      - "8080:8080"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+  blogdb:
+    image: postgres:16
+    container_name: blogdb
+    environment:
+      POSTGRES_USER: blog
+      POSTGRES_PASSWORD: blogpwd
+      POSTGRES_DB: blog
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgresql:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8081:8080"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
