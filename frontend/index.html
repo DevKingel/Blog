@@ -1,11 +1,17 @@
 <!doctype html>
-
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <title>Lit Starter Kit</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lit + TS</title>
+    <link rel="stylesheet" href="./src/index.css" />
+    <script type="module" src="/src/log.js"></script>
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/lit/polyfill-support.js"></script>
   </head>
   <body>
-    <a href="/dev/index.html">Component Demo</a>
+    <my-element>
+      <h1>Lit</h1>
+    </my-element>
   </body>
 </html>
