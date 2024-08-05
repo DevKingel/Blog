@@ -17,9 +17,6 @@ RUN npm install
 # Copiez le reste des fichiers de l'application
 COPY --chown=node:node . .
 
-# Construisez l'application
-RUN npm run build
-
 # Exposez le port de l'application
 EXPOSE 8000
 
