@@ -11,3 +11,6 @@ exit
 ls -lah
 composer install
 exit
+npm
+node
+exit

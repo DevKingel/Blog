@@ -5,6 +5,7 @@ services:
     container_name: frontend
     volumes:
       - ./frontend:/app
+      - node_modules:/app/node_modules
     networks:
       - app-network
     ports:
@@ -22,6 +23,7 @@ services:
     working_dir: /var/www
     volumes:
       - ./backend:/var/www
+      - vendor:/var/www/vendor
     networks:
       - app-network
 
@@ -75,3 +77,5 @@ networks:
 
 volumes:
   postgres-data:
+  node_modules:
+  vendor:
