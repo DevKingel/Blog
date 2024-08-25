@@ -11,7 +11,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "outDir": "./src",
-    "rootDir": "./src",
+    "rootDir": "dev",
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -39,6 +39,6 @@
     ],
     "types": ["mocha"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["dev/**/*.ts"],
   "exclude": []
 }

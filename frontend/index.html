@@ -1,15 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lit + TS</title>
-    <link rel="stylesheet" href="./src/index.css" />
-    <script type="module" src="/src/log.js"></script>
+    <title>Blog</title>
+    <link rel="stylesheet" href="./public/index.css" />
+    <script type="module" src="/src/header.js"></script>
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/footer.js"></script>
+    <script type="module" src="/src/blogPage.js"></script>
     <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../node_modules/lit/polyfill-support.js"></script>
   </head>
   <body>
-    <list-blog>
+    <!--<header-custom></header-custom>
+     <main-custom></main-custom>
+    <footer-custom></footer-custom> -->
+    <blog-page></blog-page>
   </body>
 </html>

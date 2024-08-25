@@ -7,15 +7,13 @@ RUN mkdir -p /app/node_modules && chown -R node:node /app
 WORKDIR /app
 
 # Copiez les fichiers package.json et package-lock.json
-COPY --chown=node:node package*.json ./
-
-USER node
+#COPY --chown=node:node package*.json ./
 
 # Installez les dépendances
-RUN npm install
+#RUN npm install
 
 # Copiez le reste des fichiers de l'application
-COPY --chown=node:node . .
+#COPY --chown=node:node . .
 
 # Exposez le port de l'application
 EXPOSE 8000

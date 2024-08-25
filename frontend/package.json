@@ -9,7 +9,7 @@
     "build:watch": "tsc --watch",
     "start": "web-dev-server --node-resolve --open --watch",
     "lint": "npm run lint:lit-analyzer && npm run lint:eslint",
-    "lint:eslint": "eslint 'src/**/*.ts'",
+    "lint:eslint": "eslint 'dev/**/*.ts'",
     "lint:lit-analyzer": "lit-analyzer",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",
     "analyze": "cem analyze --litelement --globs \"src/**/*.ts\"",
@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@types/mocha": "^10.0.7",
-    "lit": "^3.1.4",
-    "webcomponents": "^0.1.4"
+    "@webcomponents/webcomponentsjs": "^2.8.0",
+    "lit": "^3.1.4"
   },
   "devDependencies": {
     "@web/dev-server": "^0.4.6",
