@@ -38,6 +38,7 @@ class BlogPage extends LitElement {
     main {
       flex: 1;
       padding: 1rem;
+      position: relative;
     }
 
     .post {

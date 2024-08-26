@@ -80,8 +80,6 @@ let BlogHeader = class BlogHeader extends LitElement {
     }
 
     .menu-items {
-      position: fixed;
-      top: 56px;
       width: 100%;
     }
   `; }
@@ -93,13 +91,6 @@ let BlogHeader = class BlogHeader extends LitElement {
             <div class="logo">
               <h1>Navbar</h1>
             </div>
-            <div class="menu-items ${this.menuOpen ? 'menu-items-show' : 'menu-items-hide'}">
-              <li><a href="#">Home</a></li>
-              <li><a href="#">blogs</a></li>
-              <li><a href="#">portfolio</a></li>
-              <li><a href="#">about</a></li>
-              <li><a href="#">contact</a></li>
-            </div>
             <div
               class="hamburger-lines 
               ${this.menuOpen ? 'active' : ''}"
@@ -108,6 +99,13 @@ let BlogHeader = class BlogHeader extends LitElement {
               <span class="hamburger-line hamburger-line1"></span>
               <span class="hamburger-line hamburger-line2"></span>
               <span class="hamburger-line hamburger-line3"></span>
+            </div>
+            <div class="menu-items ${this.menuOpen ? 'menu-items-show' : 'menu-items-hide'}">
+              <li><a href="#">Home</a></li>
+              <li><a href="#">blogs</a></li>
+              <li><a href="#">portfolio</a></li>
+              <li><a href="#">about</a></li>
+              <li><a href="#">contact</a></li>
             </div>
           </div>
         </nav>
