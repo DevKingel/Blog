@@ -9,7 +9,7 @@ import { customElement, property } from 'lit/decorators.js';
 let BlogHeader = class BlogHeader extends LitElement {
     constructor() {
         super(...arguments);
-        this.menuOpen = false;
+        this.menuOpen = true;
     }
     toggleMenu() {
         this.menuOpen = !this.menuOpen;
@@ -17,13 +17,20 @@ let BlogHeader = class BlogHeader extends LitElement {
     static { this.styles = css `
     .container {
       display: flex;
-      flex-direction: row;
       align-items: center;
       justify-content: space-between;
       padding: 0 20px 0 15px;
-      border-bottom: 0px solid;
       box-shadow: 0px 1px 10px #acacac;
-      height: 55px;
+    }
+    
+    .navbar-container-open {
+      flex-direction: column;
+      align-items: start;
+    }
+
+    .logo a {
+      text-decoration: none;
+      color: #3d3d3d;
     }
 
     .hamburger-lines {
@@ -42,12 +49,22 @@ let BlogHeader = class BlogHeader extends LitElement {
       cursor: pointer;
     }
 
+    .hamburger-lines:active {
+      box-shadow: -1px -1px 3px #acacac;
+    }
+
     .hamburger-lines .hamburger-line {
       width: 65%;
       height: 3px;
       border-radius: 2px;
       background-color: #000000;
       transition: 0.25s ease-in-out;
+    }
+
+    .hamburger-lines.active {
+      position: absolute;
+      top: 23px;
+      right: 20px;
     }
 
     .active .hamburger-line1 {
@@ -67,29 +84,40 @@ let BlogHeader = class BlogHeader extends LitElement {
     }
 
     .menu-items-show {
-      display: flex;
+      width: 100%;
+    }
+
+    .menu-items-show > menu {
       flex-direction: column;
     }
 
-    .menu-items > li {
-      list-style: none;
+    .menu-items-show li {
+      justify-content: space-around;
+      display: flex;
+      padding: 15px 0px;
+      box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 2px 0px;
     }
 
-    .menu-items > li > a {
+    .menu-items-show menu {
+      padding-left: 0px;
+    }
+
+    .menu-items-show menu:first-child {
+      margin-top: 0px;
+    }
+
+    .menu-items-show li > a {
       text-decoration: none;
-    }
-
-    .menu-items {
-      width: 100%;
+      color: #3d3d3d;
     }
   `; }
     render() {
         return html `
       <header>
         <nav class="navbar">
-          <div class="container nav-container">
+          <div class="container ${this.menuOpen ? 'navbar-container-open' : ''}">
             <div class="logo">
-              <h1>Navbar</h1>
+              <h1><a href="#">Mon Blog</a></h1>
             </div>
             <div
               class="hamburger-lines 
@@ -101,11 +129,13 @@ let BlogHeader = class BlogHeader extends LitElement {
               <span class="hamburger-line hamburger-line3"></span>
             </div>
             <div class="menu-items ${this.menuOpen ? 'menu-items-show' : 'menu-items-hide'}">
+              <menu>
               <li><a href="#">Home</a></li>
               <li><a href="#">blogs</a></li>
               <li><a href="#">portfolio</a></li>
               <li><a href="#">about</a></li>
               <li><a href="#">contact</a></li>
+              </menu>
             </div>
           </div>
         </nav>
