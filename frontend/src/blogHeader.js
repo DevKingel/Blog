@@ -9,7 +9,7 @@ import { customElement, property } from 'lit/decorators.js';
 let BlogHeader = class BlogHeader extends LitElement {
     constructor() {
         super(...arguments);
-        this.menuOpen = true;
+        this.menuOpen = false;
         /** Sizes  */
         this.smallWidth = 600;
         this.windowWidth = window.innerWidth;

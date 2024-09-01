@@ -4,7 +4,7 @@ import {customElement, property} from 'lit/decorators.js';
 @customElement('blog-header')
 class BlogHeader extends LitElement {
   @property({type: Boolean})
-  menuOpen = true;
+  menuOpen = false;
 
   /** Sizes  */
   @property({type: Number})
