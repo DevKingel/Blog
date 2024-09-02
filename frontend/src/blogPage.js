@@ -26,29 +26,63 @@ let BlogPage = class BlogPage extends LitElement {
             },
             {
                 title: 'Troisième article de blog',
-                date: '8 Août 2024',
+                date: '9 Août 2024',
                 summary: 'Résumé du troisième article de blog...',
+                link: '#',
+            },
+            {
+                title: 'Quatrième article de blog',
+                date: '7 Août 2024',
+                summary: 'Résumé du quatrième article de blog, avec une longue phrase pour voir si ça casse pas tout',
+                link: '#',
+            },
+            {
+                title: 'Cinquième article de blog',
+                date: '6 Août 2024',
+                summary: 'Résumé du cinquième article de blog...',
+                link: '#',
+            },
+            {
+                title: 'Sixième article de blog',
+                date: '5 Août 2024',
+                summary: 'Résumé du sixième article de blog...',
+                link: '#',
+            },
+            {
+                title: 'Septième article de blog',
+                date: '4 Août 2024',
+                summary: 'Résumé du septième article de blog...',
+                link: '#',
+            },
+            {
+                title: 'Huitième article de blog',
+                date: '3 Août 2024',
+                summary: 'Résumé du huitième article de blog...',
+                link: '#',
+            },
+            {
+                title: 'Neuvième article de blog',
+                date: '2 Août 2024',
+                summary: 'Résumé du neuvième article de blog...',
                 link: '#',
             },
         ];
     }
     static { this.styles = css `
     :host {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
       font-family: Arial, sans-serif;
+      font-size: 1rem;
     }
 
     main {
-      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      grid-gap: 1rem;
       padding: 1rem;
-      position: relative;
     }
 
     .post {
-      margin-bottom: 20px;
-      padding: 15px;
+      padding: 1rem;
       border: 1px solid #ddd;
       border-radius: 5px;
       background-color: #f9f9f9;
@@ -56,25 +90,18 @@ let BlogPage = class BlogPage extends LitElement {
 
     .post h2 {
       margin-top: 0;
-      font-size: 24px;
       color: #2c3e50;
     }
 
     .post .date {
-      font-size: 14px;
       color: #888;
-      margin-bottom: 10px;
     }
 
     .post p {
-      font-size: 16px;
-      line-height: 1.5;
       color: #333;
     }
 
     .post a {
-      display: inline-block;
-      margin-top: 10px;
       color: #1abc9c;
       text-decoration: none;
     }
