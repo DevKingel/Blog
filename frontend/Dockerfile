@@ -1,5 +1,5 @@
 # Utilisez une image Node.js comme image de base
-FROM node:22
+FROM node:22-slim
 
 RUN mkdir -p /app/node_modules && chown -R node:node /app
 
@@ -16,7 +16,7 @@ WORKDIR /app
 #COPY --chown=node:node . .
 
 # Exposez le port de l'application
-EXPOSE 8000
+EXPOSE 3000
 
 # Démarrez l'application
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
