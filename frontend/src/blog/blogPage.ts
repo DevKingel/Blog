@@ -1,7 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import './blogHeader';
-import './blogFooter';
 
 @customElement('blog-page')
 class BlogPage extends LitElement {
@@ -108,7 +106,6 @@ class BlogPage extends LitElement {
 
   override render() {
     return html`
-      <blog-header></blog-header>
       <main>
         ${this.posts.map(
           (post) => html`
@@ -121,7 +118,6 @@ class BlogPage extends LitElement {
           `
         )}
       </main>
-      <blog-footer></blog-footer>
     `;
   }
 }

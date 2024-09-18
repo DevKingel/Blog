@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blog</title>
     <link rel="stylesheet" href="./public/index.css" />
-    <script type="module" src="/src/blogPage.ts"></script>
-    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../node_modules/lit/polyfill-support.js"></script>
+    <!-- <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script> -->
+    <!-- <script src="../node_modules/lit/polyfill-support.js"></script> -->
   </head>
   <body>
-    <!--<header-custom></header-custom>
-     <main-custom></main-custom>
-    <footer-custom></footer-custom> -->
-    <blog-page></blog-page>
+    <div id="outlet"></main>
+    <script type="module" src="/src/index.ts"></script>
   </body>
 </html>

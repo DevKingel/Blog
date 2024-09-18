@@ -8,8 +8,5 @@ export default defineConfig({
     //origin: 'http://127.0.0.1:3000',
     host: true,
     port: 3000,
-    watch : {
-
-    }
   }
 })
