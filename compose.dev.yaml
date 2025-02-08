@@ -32,6 +32,9 @@ services:
         XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
         XDEBUG_LOG: /dev/stdout
         XDEBUG_LOG_LEVEL: 0
+        MAX_EXECUTION_TIME: 0
+    extra_hosts:
+      - host.docker.internal:host-gateway
     env_file:
       # Load the environment variables from the Laravel application
       - .env
@@ -59,6 +62,9 @@ services:
         XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
         XDEBUG_LOG: /dev/stdout
         XDEBUG_LOG_LEVEL: 0
+        MAX_EXECUTION_TIME: 0
+    extra_hosts:
+      - host.docker.internal:host-gateway
     tty: true  # Enables an interactive terminal
     stdin_open: true  # Keeps standard input open for 'docker exec'
     env_file:
