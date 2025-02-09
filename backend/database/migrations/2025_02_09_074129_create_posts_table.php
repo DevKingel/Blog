@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->text('content');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained();
             $table->timestamps();
         });
     }
