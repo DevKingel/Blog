@@ -1,3 +1,7 @@
 {
-    "php.version": "8.4"
+    "php.version": "8.4",
+    // "php.executablePath" : "docker compose -f compose.dev.yaml exec -t php-fpm php",
+    // "php.validate.executablePath": "docker compose -f compose.dev.yaml exec -t php-fpm php",
+    // "php.debug.executablePath": "${workspaceFolder}/../../../php",
+    "php.debug.ideKey": "DOCKER",
 }
