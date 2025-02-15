@@ -13,7 +13,10 @@ class PostController extends Controller
      */
     public function index()
     {
-        return Post::all();
+        $posts = Post::select(['id', 'title', 'slug', 'description', 'created_at', 'updated_at'])->with(['user:name', 'category:name', 'tags:name'])
+                      ->paginate(10);
+
+        return response()->json($posts);
     }
 
     /**
