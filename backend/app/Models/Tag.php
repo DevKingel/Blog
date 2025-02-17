@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Tag extends Model
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -18,6 +19,9 @@ class Tag extends Model
         'slug',
     ];
 
+    /**
+     * @return BelongsToMany<\App\Models\Post, $this>
+     */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class);

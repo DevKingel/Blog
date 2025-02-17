@@ -11,9 +11,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Category extends Model
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
-    public function posts(): HasMany
+    /**
+     * @return HasMany<\App\Models\Post, $this>
+     */
+    public function posts()
     {
         return $this->hasMany(Post::class);
     }

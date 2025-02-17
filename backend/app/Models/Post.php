@@ -13,13 +13,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Post extends Model
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'title',
         'slug',
@@ -29,23 +25,35 @@ class Post extends Model
         'category_id',
     ];
 
-    public function user(): BelongsTo
+    /**
+     * @return BelongsTo<\App\Models\User, $this>
+     */
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function tags(): BelongsToMany
+    /**
+     * @return BelongsToMany<\App\Models\Tag, $this>
+     */
+    public function tags()
     {
         return $this->belongsToMany(Tag::class)
             ->select(['tags.id', 'tags.name'])->withPivot([]);
     }
 
-    public function category(): BelongsTo
+    /**
+     * @return belongsTo<\App\Models\Category, $this>
+     */
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function comments(): HasMany
+    /**
+     * @return hasMany<\App\Models\Comment, $this>
+     */
+    public function comments()
     {
         return $this->hasMany(Comment::class);
     }
