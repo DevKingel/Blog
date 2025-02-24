@@ -10,6 +10,7 @@ class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
      * @return \Illuminate\Http\JsonResponse | mixed
      */
     public function index()
@@ -22,6 +23,7 @@ class PostController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
      * @return void
      */
     public function store(Request $request)
@@ -31,6 +33,7 @@ class PostController extends Controller
 
     /**
      * Display the specified resource.
+     *
      * @return \App\Models\Post
      */
     public function show(string $id)
@@ -40,6 +43,7 @@ class PostController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
      * @return void
      */
     public function update(Request $request, string $id)
@@ -49,6 +53,7 @@ class PostController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @return void
      */
     public function destroy(string $id)
