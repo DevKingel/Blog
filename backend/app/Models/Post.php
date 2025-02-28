@@ -38,8 +38,7 @@ class Post extends Model
      */
     public function tags()
     {
-        return $this->belongsToMany(Tag::class)
-            ->select(['tags.id', 'tags.name'])->withPivot([]);
+        return $this->belongsToMany(Tag::class);
     }
 
     /**
