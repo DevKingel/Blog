@@ -111,7 +111,8 @@
 
 ## 6\. 🧱 Architecture
 
--   **Diagram:** `docs/architecture.png` (A diagram showing Next.js client, FastAPI backend, PostgreSQL DB, and Redis cache as separate, containerized services).
+-   **Diagram:**  (A diagram showing Next.js client, FastAPI backend, PostgreSQL DB, and Redis cache as separate, containerized services).
+![Architecture diagram](/docs/images/architecture.png)
 
 ### Modules
 
