@@ -1,0 +1,9 @@
+services:
+  adminer:
+    image: adminer:latest
+    depends_on:
+      - postgres
+    environment:
+      - ADMINER_DESIGN=pepa-linha-dark
+    ports:
+      - "8080:8080"

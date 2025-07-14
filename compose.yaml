@@ -1,0 +1,51 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - blog
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://user:password@postgres:5432/blogdb
+    depends_on:
+      - postgres
+    networks:
+      - blog
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blogdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - blog
+  redis:
+    image: redis:8-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - blog
+    
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  blog:
