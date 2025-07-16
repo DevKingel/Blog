@@ -8,14 +8,16 @@ The initial planning is the most critical part of launching a successful blog. T
 
 * **Define Your Core Purpose:** The blog will be a multi-purpose platform for personal and tech articles, designed for a broad audience.
 * **Set SMART Objectives:** Your goals remain focused on developing the role-based platform, now with the added complexity of content taxonomies.
-* **Define Your Target Audience:** The audience is a mix of tech-savvy users and the general public. This reinforces the need for an intuitive UI.
+* **Define Your Target Audience:** The audience is a mix of tech-savvy users and the general public, reinforcing the need for an intuitive UI.
 * **Requirements Gathering and Scope:**
     * **In Scope (Functionality):**
-        * Three-tier user roles (Admin, Writer, Reader) with specific permissions.
-        * A comment system for authenticated users.
-        * **New:** An Admin-managed system for creating and assigning **categories** and **tags** to articles.
-        * **New:** The application must be **Server-Side Rendered (SSR)** for optimal **SEO** and initial load performance.
-        * **New:** The application must feel like a **Single-Page Application (SPA)** during user navigation.
+        * **Unauthenticated Users:** Can read published articles but cannot post comments.
+        * **Reader Role:** Can manage their own account, read published articles, and post/manage their own comments.
+        * **Writer Role:** All Reader permissions, plus the ability to create, edit, and manage their own articles (drafts and published).
+        * **Admin Role:** All Writer permissions, plus access to an admin dashboard to manage all users, articles, and comments, and to view site-wide statistics.
+        * An Admin-managed system for creating and assigning **categories** and **tags** to articles.
+        * The application must be **Server-Side Rendered (SSR)** for optimal **SEO** and initial load performance.
+        * The application must feel like a **Single-Page Application (SPA)** during user navigation.
 
 ---
 
@@ -56,7 +58,7 @@ This blueprint now includes the data structures and routes for your content taxo
 
 ### **Part II: Core Execution and Delivery**
 
-This development phase details the implementation of your new features, with a strong emphasis on the technical strategy for rendering and SEO.
+This development phase details the implementation of your new features, with a strong emphasis on the technical strategy for rendering, SEO, and user permissions.
 
 ---
 
@@ -67,7 +69,9 @@ This development phase details the implementation of your new features, with a s
     * **Frontend (Next.js):**
         * **Admin UI:** In the admin dashboard, create the interface for managing categories and tags.
         * **Writer UI:** In the article editor, add a component that allows writers to select from the list of existing categories and tags to associate with their posts.
-
+* **Feature: Comment System:**
+    * **Frontend:** A component below each article will display all existing comments to every visitor. However, the form to submit a new comment will only be visible or enabled for authenticated users (Reader, Writer, Admin).
+    * **Backend:** Endpoints to create, read, and delete comments, with business logic to ensure users can only delete their own comments (unless they are an Admin).
 * **Frontend Development (SSR, SPA, and SEO Focus):**
     * **Server-Side Rendering (SSR):**
         * For dynamic pages that need to be indexed by search engines (like `/blog/[slug]`, `/category/[slug]`), you will use the **`getServerSideProps`** function in Next.js.
@@ -84,7 +88,7 @@ This development phase details the implementation of your new features, with a s
 
 #### **Section 6: Comprehensive Quality Assurance (QA) and Testing**
 
-Your testing strategy must now include comprehensive checks for the role-based access control.
+Your testing must now validate the new features, the role-based access control and the SSR/SEO implementation.
 
 * **Functional and Security Testing:**
     * Write specific tests to verify your authorization logic. Create test scenarios for each role.
