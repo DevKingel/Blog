@@ -6,96 +6,79 @@ The initial planning is the most critical part of launching a successful blog. T
 
 #### **Section 1: Project Initiation and Discovery**
 
-This phase is about defining a clear, unified vision. It translates your ideas into a concrete plan, which is crucial for a project with distinct user roles and content types.
-
-* **Define Your Core Purpose:** The blog will serve a dual purpose: it will be a personal space to share articles about your daily life and a professional platform to publish tech and development articles.
-* **Set SMART Objectives:**
-    * "Develop the core platform with a three-tier role system (Admin, Writer, Reader) and deploy the initial version in 4 months."
-    * "Publish 4 articles (2 tech, 2 personal) and onboard 10 beta readers for feedback within the first month post-launch."
-* **Define Your Target Audience:** You will be writing for a mixed audience, including developers, gamers, and the general public. This means your design must be intuitive for non-tech users, and your writing voice must be adaptable.
-* **Requirements Gathering and Scope:** The introduction of user roles is the most significant requirement.
+* **Define Your Core Purpose:** The blog will be a multi-purpose platform for personal and tech articles, designed for a broad audience.
+* **Set SMART Objectives:** Your goals remain focused on developing the role-based platform, now with the added complexity of content taxonomies.
+* **Define Your Target Audience:** The audience is a mix of tech-savvy users and the general public. This reinforces the need for an intuitive UI.
+* **Requirements Gathering and Scope:**
     * **In Scope (Functionality):**
-        * **Public Users (Not Logged In):** Can read published articles.
-        * **Reader Role:** Can manage their own account, read published articles, and post/manage their own comments.
-        * **Writer Role:** All Reader permissions, plus the ability to create, edit, and manage their own articles (drafts and published).
-        * **Admin Role:** All Writer permissions, plus access to an admin dashboard to manage all users, articles, and comments, and to view site-wide statistics.
-    * **Out of Scope (For Initial Launch):** Social media login, full-text search engine, and real-time notifications.
+        * Three-tier user roles (Admin, Writer, Reader) with specific permissions.
+        * A comment system for authenticated users.
+        * **New:** An Admin-managed system for creating and assigning **categories** and **tags** to articles.
+        * **New:** The application must be **Server-Side Rendered (SSR)** for optimal **SEO** and initial load performance.
+        * **New:** The application must feel like a **Single-Page Application (SPA)** during user navigation.
 
 ---
 
 #### **Section 2: Strategic Planning & Information Architecture (IA)**
 
-This is the technical blueprint, now updated to include the logic for multiple user roles and content categories.
+This blueprint now includes the data structures and routes for your content taxonomies and aligns with a modern, SEO-friendly architecture.
 
-* **Technology Stack & Architecture:** The stack remains Next.js, FastAPI, PostgreSQL, Redis, and Docker. The architecture must now explicitly support role-based access control (RBAC).
+* **Technology Stack & Architecture:**
+    * **Next.js** is specifically chosen for its powerful hybrid framework capabilities. It will provide true **Server-Side Rendering (SSR)** on a per-request basis, which is essential for SEO. Once loaded, its client-side routing will deliver a fluid **SPA** experience.
 * **Information Architecture (IA):**
-    * **API Endpoints (FastAPI):** Your API needs role-protected endpoints.
-        * **Public:** `GET /posts`, `GET /posts/{post_id}`
-        * **Reader+:** `POST /comments`, `PUT /users/me`, `GET /users/me`
-        * **Writer+:** `POST /posts`, `PUT /posts/{post_id}` (with ownership check)
-        * **Admin Only:** `GET /admin/stats`, `GET /users`, `DELETE /comments/{comment_id}`
-    * **Page Routes (Next.js):** The frontend requires role-specific pages and layouts.
-        * **Public:** `/`, `/blog/[slug]`, `/login`, `/register`
-        * **Reader+:** `/profile`
-        * **Writer+:** `/writer/dashboard`, `/writer/editor/{post_id}`
-        * **Admin Only:** `/admin/dashboard`, `/admin/users`, `/admin/content`
     * **Database Schema (PostgreSQL):**
-        * The `users` table must have a `role` column (e.g., using a PostgreSQL `ENUM` type for 'reader', 'writer', 'admin').
-        * The `posts` table needs a `category` column ('Tech', 'Personal Life') and a `status` column ('draft', 'published').
+        * Create tables for `categories` and `tags`.
+        * Create join tables (`post_categories` and `post_tags`) to establish the many-to-many relationships between posts and your taxonomies.
+    * **API Endpoints (FastAPI):**
+        * Develop Admin-only CRUD endpoints for `/categories` and `/tags`.
+        * Update the `GET /posts` endpoint to allow filtering by category or tag slugs.
+    * **Page Routes (Next.js):**
+        * Add dynamic routes to browse by taxonomy: `/category/[slug]` and `/tag/[slug]`.
+        * The Admin dashboard will need routes for managing categories and tags: `/admin/categories` and `/admin/tags`.
 
 ---
 
 #### **Section 3: UI/UX Design and Prototyping**
 
-This phase focuses on creating a modern, eye-friendly design that reflects your personal aesthetic and caters to a broad audience.
-
-* **Create Wireframes:** Design distinct wireframes for each major view: the public article page, the user profile, the writer's article editor, and the admin's statistical dashboard.
-* **Develop a Comprehensive Style Guide:**
-    * **Color Palette:** Based on your themes of plants, wood, mountains, and steampunk, here is a proposed eye-friendly, modern color scheme:
-        * **Background:** `#24282B` (Dark Charcoal) - A deep, dark base that's easy on the eyes.
-        * **Text:** `#E8E2D9` (Alabaster) - A soft, off-white for high readability without harsh contrast.
-        * **Primary (Wood & Earth):** `#5C3D2E` (Deep Coffee) - For major UI components like footers or sidebars.
-        * **Secondary (Plants):** `#364B44` (Brunswick Green) - For secondary elements and accents.
-        * **Accent (Steampunk Brass):** `#C8A870` (Antique Brass) - For critical interactive elements like buttons and links to draw user attention.
-    * **Component Styling:** Use a framework like Tailwind CSS to create reusable components that use these color variables, ensuring a consistent and professional look.
-* **Design for Responsiveness:** Ensure the design works flawlessly on all devices. The admin dashboard, in particular, must be usable on mobile for on-the-go management.
+* **Create Wireframes:** Design the views for managing categories and tags in the admin panel. Also, design how categories and tags will be displayed on article pages and as filterable lists.
+* **Develop a Comprehensive Style Guide:** The proposed color palette remains ideal for your aesthetic:
+    * **Background:** `#24282B` (Dark Charcoal)
+    * **Text:** `#E8E2D9` (Alabaster)
+    * **Primary:** `#5C3D2E` (Deep Coffee)
+    * **Secondary:** `#364B44` (Brunswick Green)
+    * **Accent:** `#C8A870` (Antique Brass)
 
 ---
 
 #### **Section 4: Content Strategy and Creation**
 
-Your content strategy must accommodate two distinct streams of articles.
-
-* **Create a Content Matrix:** Your content spreadsheet should now include a `Category` column ('Tech' or 'Personal Life'). This will help you balance your content and plan your writing schedule.
-* **Define Brand Voice and Tone:** Develop a flexible voice. For tech articles, it can be precise and informative. For daily life posts, it can be more personal and reflective. The overall tone should remain authentic and approachable to bridge the gap between your audiences.
-* **Write Initial Content:** Before launch, write at least two tech articles and two personal articles. Also, write the copy for your core pages (About, Contact).
+* **Create a Content Matrix:** Your content planning spreadsheet should now include dedicated columns for `Category` and `Tags` for each planned article. This helps organize your content from the start.
 
 ### **Part II: Core Execution and Delivery**
 
-This is where you build the application, with a strong focus on implementing the role-based features.
+This development phase details the implementation of your new features, with a strong emphasis on the technical strategy for rendering and SEO.
 
 ---
 
 #### **Section 5: Technical Development and Implementation**
 
-Development is now more complex, involving authorization logic throughout the stack.
+* **Feature: Category and Tag Management:**
+    * **Backend (FastAPI):** Build the CRUD endpoints for categories and tags. Secure them so that only users with the 'Admin' role can access them.
+    * **Frontend (Next.js):**
+        * **Admin UI:** In the admin dashboard, create the interface for managing categories and tags.
+        * **Writer UI:** In the article editor, add a component that allows writers to select from the list of existing categories and tags to associate with their posts.
 
-* **Foundational Setup:** Your Docker setup remains the same, but you will initialize your PostgreSQL database with the new tables for users (with roles), posts, and comments.
-* **User Authentication and Authorization System:**
-    * **Database Schema:** Create the `users` table with a `role` column. Create `posts` and `comments` tables with foreign keys linking back to the `user_id`.
-    * **Backend (FastAPI):** This is a critical task. Implement a robust dependency injection system for security. A dependency function will check the user's JWT token for their role and grant or deny access to endpoints accordingly. You must also implement ownership checks (e.g., a writer can only edit posts where the `author_id` matches their own).
-    * **Frontend (Next.js):** Implement role-based rendering. Fetch the user's role upon login and store it in a global state (e.g., using React Context). Use this state to:
-        * Conditionally render UI elements (e.g., show an "Admin" link in the nav).
-        * Protect pages from unauthorized access.
-* **Feature Development:**
-    * **Writer Dashboard:** A dedicated page where a writer can view a table of their articles, see their status ('draft'/'published'), and have options to edit or create new ones.
-    * **Admin Dashboard:** A multi-tabbed interface for admins. It will feature:
-        * A user management table to view, edit roles, or delete users.
-        * A content management table to manage all articles and comments.
-        * A statistics view with charts (using a library like **Recharts** or **Chart.js**) displaying data like new users per week or views per article.
-    * **Comment System:**
-        * **Frontend:** A component below each article to display comments and a form for authenticated users to submit new ones.
-        * **Backend:** Endpoints to create, read, and delete comments, with business logic to ensure users can only delete their own comments (unless they are an Admin).
+* **Frontend Development (SSR, SPA, and SEO Focus):**
+    * **Server-Side Rendering (SSR):**
+        * For dynamic pages that need to be indexed by search engines (like `/blog/[slug]`, `/category/[slug]`), you will use the **`getServerSideProps`** function in Next.js.
+        * This function runs on the server for every request, fetches the necessary data from your FastAPI backend, and uses it to pre-render the complete HTML page. This is the core of your SEO strategy, as it ensures search engine crawlers receive fully-populated content.
+    * **Single-Page Application (SPA) Experience:**
+        * To achieve the fluid feel of an SPA, you will use the Next.js **`<Link>`** component for all internal navigation.
+        * When a user clicks a `<Link>`, Next.js handles the routing on the client-side without a full page reload, fetching only the necessary data and updating the UI. This combination gives you the best of both worlds: great SEO from SSR and a fast user experience from client-side navigation.
+    * **Search Engine Optimization (SEO):**
+        * **Metadata:** For each page, especially blog posts, dynamically manage SEO-critical tags. Use the built-in Next.js `metadata` object to set a unique `<title>` and `<meta name="description">` for each page. This is crucial for search engine rankings.
+        * **Semantic HTML:** Write clean, semantic HTML for your components. Use `<h1>` for the main title, `<h2>` for subheadings, and so on.
+        * **Sitemap:** After launch, submit an XML sitemap to Google Search Console to help it discover all your pages.
 
 ---
 
@@ -106,10 +89,14 @@ Your testing strategy must now include comprehensive checks for the role-based a
 * **Functional and Security Testing:**
     * Write specific tests to verify your authorization logic. Create test scenarios for each role.
     * **Example Scenarios:**
+        * "Write test cases to ensure that only Admins can create/edit/delete categories and tags."
         * "Verify a 'Reader' receives a 403 Forbidden error when trying to access the `POST /posts` endpoint."
         * "Verify a 'Writer' can successfully edit their own post but gets a 403 error when trying to edit another writer's post."
         * "On the frontend, verify that a logged-in 'Reader' cannot see the 'Writer Dashboard' link in the navigation."
     * Use E2E tests with Cypress or Playwright to automate logging in as different roles and attempting to access restricted pages and features.
+* **SEO and SSR Validation:**
+    * For a key page like a blog post, use your browser's "View Page Source" feature. **Verify that the rendered HTML contains the full text of the article.** If you only see JavaScript, SSR is not working correctly.
+    * Use Google's Rich Results Test to see how a search engine crawler "sees" your page and to validate your metadata.
 
 ---
 
