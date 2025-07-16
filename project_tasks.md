@@ -1,31 +1,40 @@
-Of course. Here is a granular, step-by-step task list designed for an AI assistant to build your application from scratch to production.
-
-***
-
 ## Phase 1: Project Setup & Foundation 🏗️
 
-This phase creates the skeleton of your project, including the directory structure and Docker configuration.
+This phase creates the skeleton of your project, including architectural planning, directory structures, and Docker configuration.
 
+* **Project Architecture & Planning**
+    * `[ ]` Create a `SITEMAP.md` file in the root directory. This file should outline the application's structure to guide development. It must include:
+        * **Public Pages:** Homepage (`/`), Blog Post (`/blog/[slug]`), Category View (`/category/[slug]`), Tag View (`/tag/[slug]`), Login (`/login`), Register (`/register`).
+        * **Authenticated Pages:** User Profile (`/profile`).
+        * **Writer Pages:** Writer Dashboard (`/writer/dashboard`), Post Editor (`/writer/editor/[id]`).
+        * **Admin Pages:** Admin Dashboard (`/admin/dashboard`), User Management (`/admin/users`), Content Management (`/admin/content`), Taxonomy Management (`/admin/categories`).
+        * **Key Components:** `Navbar`, `Footer`, `PostCard`, `CommentList`, `CommentForm`.
 * **Project Initialization**
     * `[ ]` Create a root project directory.
     * `[ ]` Initialize a `git` repository in the root directory.
     * `[ ]` Create a `.gitignore` file with appropriate entries for Python, Node.js, and OS-specific files.
     * `[ ]` Create a main `README.md` file with the project title.
-* **Docker Configuration**
-    * `[ ]` Create a `docker-compose.yml` file in the root.
-    * `[ ]` Define the `backend` service in `docker-compose.yml`, pointing to a `./backend` directory.
-    * `[ ]` Define the `frontend` service in `docker-compose.yml`, pointing to a `./frontend` directory.
-    * `[ ]` Define the `db` service in `docker-compose.yml` using the official `postgres:15` image.
-    * `[ ]` Define the `cache` service in `docker-compose.yml` using the official `redis:7` image.
-    * `[ ]` Configure environment variables for the PostgreSQL service (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`).
-    * `[ ]` Create a named volume in `docker-compose.yml` for PostgreSQL data persistence.
-* **Backend Application Setup**
+* **Initial File Structure**
     * `[ ]` Create the `./backend` directory.
+    * `[ ]` Inside `./backend`, create an `app` directory.
+    * `[ ]` Inside `./backend/app`, create `__init__.py`, `main.py`, and sub-directories: `api`, `core`, `db`, `models`, `schemas`.
+    * `[ ]` Create the `./frontend` directory.
+    * `[ ]` Inside `./frontend`, create standard Next.js directories: `components`, `pages`, `styles`, `lib`.
+* **Docker Configuration**
+    * `[ ]` Create a base `compose.yaml` file in the root.
+    * `[ ]` Define the `backend`, `frontend`, `db`, and `cache` services in `compose.yaml` without development-specific settings like ports or volumes.
+    * `[ ]` Configure a named volume in `compose.yaml` for PostgreSQL data persistence.
+    * `[ ]` Create a `compose.override.yaml` file. This file will automatically be used by Docker Compose in development.
+    * `[ ]` In `compose.override.yaml`, add development configurations: map local source code (`./backend:/app`, `./frontend:/app`) into the containers and expose ports (`8000:8000`, `3000:3000`).
+    * `[ ]` Create a `compose.production.yaml` file for production-specific settings.
+    * `[ ]` In `compose.production.yaml`, configure services to use production environment files and not mount local source code.
+    * `[ ]` Create a `.env.example` file in the `./backend` directory, listing variables like `DATABASE_URL` and `SECRET_KEY`.
+    * `[ ]` Create a `.env.example` file in the `./frontend` directory, listing variables like `NEXT_PUBLIC_API_URL`.
+* **Backend Application Setup**
     * `[ ]` Create a `Dockerfile` inside the `./backend` directory.
     * `[ ]` Create a `requirements.txt` file in `./backend` and add `fastapi`, `uvicorn`, `psycopg2-binary`, `SQLAlchemy`, `passlib[bcrypt]`, `python-jose[cryptography]`, and `python-multipart`.
     * `[ ]` Create a basic FastAPI application in `./backend/app/main.py` with a single "/" health check endpoint.
 * **Frontend Application Setup**
-    * `[ ]` Create the `./frontend` directory.
     * `[ ]` Create a `Dockerfile` inside the `./frontend` directory for the Next.js app.
     * `[ ]` Run `npx create-next-app@latest ./frontend` to initialize the Next.js project.
 
@@ -140,6 +149,6 @@ This phase moves the application to a live server.
 * `[ ]` Set up a reverse proxy (e.g., Nginx) to handle incoming traffic and route to the correct container.
 * `[ ]` Configure Nginx to serve the Next.js frontend and proxy API requests to the FastAPI backend.
 * `[ ]` Install an SSL certificate using Let's Encrypt for HTTPS.
-* `[ ]` Pull the final code, build the production Docker images, and launch the application using `docker-compose`.
+* `[ ]` Pull the final code, build the production Docker images, and launch the application using `compose -f compose.yaml -f compose.production.yaml up -d --build`.
 * `[ ]` Manually create the first `admin` user in the production database.
 * `[ ]` Submit the sitemap to Google Search Console.
