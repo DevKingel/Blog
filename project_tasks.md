@@ -101,22 +101,113 @@ This phase builds the user interface and connects it to the backend API.
 
 ## Phase 4: Integration & Feature Completion 🔗
 
-This phase connects the frontend and backend for specific user roles and features.
+This phase focuses on building the frontend pages and components, integrating them with the backend API, and implementing the complete feature set for each user role.
 
-* **Server-Side Rendering (SSR) & SEO**
-    * `[ ]` Use `getServerSideProps` on the `[slug].tsx` page to fetch post data and render it on the server.
-    * `[ ]` Use the `Head` component in Next.js to dynamically set the `<title>` and `<meta name="description">` for each blog post.
-* **Writer Role Features**
-    * `[ ]` Create a protected page for the writer dashboard (`/pages/writer/dashboard.tsx`).
-    * `[ ]` Build the UI for the writer to see a table of their own articles.
-    * `[ ]` Create a post editor page with a rich text editor (e.g., TipTap or TinyMCE).
-    * `[ ]` Implement the logic to create and update posts from the editor, including associating categories and tags.
-* **Admin Role Features**
-    * `[ ]` Create protected pages for the admin dashboard.
-    * `[ ]` Build the UI for managing users (view list, change roles).
-    * `[ ]` Build the UI for managing all comments (view list, delete).
-    * `[ ]` Build the UI for managing categories and tags (create, edit, delete).
-    * `[ ]` Build the UI to display site statistics using a chart library like Recharts.
+### **Public Pages (No Login Required)**
+
+* **Home / Landing Page (`/`)**
+    * `[ ]` In `pages/index.tsx`, implement `getServerSideProps` to fetch the latest or featured posts from the backend.
+    * `[ ]` Build a `Hero` component for the top of the page (optional).
+    * `[ ]` Build a `FeaturedPostsGrid` component that uses the `PostCard` component to display posts.
+    * `[ ]` Build a `SearchBar` component (UI only for now).
+    * `[ ]` Build a `CategoriesList` component that fetches and displays all categories as links.
+* **Article Listing Page (`/blog`)**
+    * `[ ]` Create the page file `pages/blog/index.tsx`.
+    * `[ ]` Implement `getServerSideProps` to fetch the first page of published articles.
+    * `[ ]` Build a `FilterControls` component with dropdowns for categories and tags.
+    * `[ ]` Implement state management for search and filter values.
+    * `[ ]` Update the data fetching logic to include pagination and pass filter parameters to the API.
+    * `[ ]` Build a `Pagination` component for navigating between pages of articles.
+* **Article Detail Page (`/blog/[slug]`)**
+    * `[ ]` In `pages/blog/[slug].tsx`, use `getServerSideProps` to fetch the specific post, its author, and comments.
+    * `[ ]` Build an `ArticleHeader` component to display the post title, author link, date, and categories/tags.
+    * `[ ]` Build an `ArticleBody` component to safely render the post's HTML or Markdown content.
+    * `[ ]` Build a `CommentThread` component to display the list of comments.
+    * `[ ]` Integrate the `CommentForm` component, ensuring it is disabled or hidden if the user is not logged in.
+    * `[ ]` Use the `Head` component to dynamically set the `title` and `meta description` for SEO.
+* **Author Profile Page (`/author/[id]`)**
+    * `[ ]` Create the dynamic page file `pages/author/[id].tsx`.
+    * `[ ]` Implement `getServerSideProps` to fetch the author's public profile data and their published posts.
+    * `[ ]` Build an `AuthorBio` component to display their name, avatar, and bio.
+    * `[ ]` Reuse the `PostCard` component to create a grid of the author's articles.
+* **Static Pages**
+    * `[ ]` Create the `pages/about.tsx` page with static informational content.
+    * `[ ]` Create the `pages/contact.tsx` page and integrate a contact form component.
+    * `[ ]` Create the `pages/terms.tsx` and `pages/privacy.tsx` pages.
+
+---
+
+### **Authentication Pages**
+
+* **Login Page (`/login`)**
+    * `[ ]` In `pages/login.tsx`, build the login form UI.
+    * `[ ]` Implement the `onSubmit` handler to call the `/auth/token` API endpoint.
+    * `[ ]` On success, store the JWT and redirect the user.
+    * `[ ]` Display error messages from the API on failure.
+* **Register Page (`/register`)**
+    * `[ ]` In `pages/register.tsx`, build the registration form UI.
+    * `[ ]` Implement the `onSubmit` handler to call the `/auth/register` API endpoint.
+    * `[ ]` On success, redirect the user to the login page with a success message.
+* **Forgot/Reset Password**
+    * `[ ]` **Backend Task:** Create `/password/forgot` and `/password/reset` endpoints in FastAPI.
+    * `[ ]` Create the `pages/forgot-password.tsx` page with a form to submit an email.
+    * `[ ]` Create the dynamic page `pages/reset-password/[token].tsx` with a form to enter a new password.
+
+---
+
+### **Writer Pages (Role-Protected)**
+
+* **Writer Dashboard (`/writer/dashboard`)**
+    * `[ ]` Create the protected page `pages/writer/dashboard.tsx`.
+    * `[ ]` Implement `getServerSideProps` with authentication checks to fetch data for the current writer.
+    * `[ ]` Build a `QuickStats` component to show views and comments on the writer's posts.
+    * `[ ]` Build two list components: `MyDraftsList` and `MyPublishedList`, showing the writer's posts.
+* **Create/Edit Post Page (`/writer/editor/[id]`)**
+    * `[ ]` Create the protected dynamic page `pages/writer/editor/[id].tsx`.
+    * `[ ]` Build the main editor form, including fields for title and slug.
+    * `[ ]` Integrate a rich text editor component (e.g., TipTap).
+    * `[ ]` Build a `CategoryTagSelector` component to associate taxonomies with the post.
+    * `[ ]` Build an `ImageUpload` component.
+    * `[ ]` Implement the "Save Draft" and "Publish" actions to call the correct backend endpoints.
+    * `[ ]` If an `id` is present, fetch the existing post data to populate the editor form.
+
+---
+
+### **Admin Pages (Role-Protected)**
+
+* **Admin Dashboard (`/admin/dashboard`)**
+    * `[ ]` Create the protected page `pages/admin/dashboard.tsx`.
+    * `[ ]` Fetch and display `SiteHealth` stats (total posts, users, etc.).
+    * `[ ]` Build a `SiteAnalytics` component using a chart library to show pageviews over time.
+    * `[ ]` Build `TopPosts` and `RecentActivity` list components.
+* **Article Management (`/admin/articles`)**
+    * `[ ]` Create the protected page `pages/admin/articles.tsx`.
+    * `[ ]` Build a data table component to display all posts from all authors.
+    * `[ ]` Implement functionality for searching, filtering, and performing bulk actions (publish, unpublish, delete).
+* **Comment Management (`/admin/comments`)**
+    * `[ ]` Create the protected page `pages/admin/comments.tsx`.
+    * `[ ]` Build a data table to display all comments with actions to approve or delete.
+* **User Management (`/admin/users`)**
+    * `[ ]` Create the protected page `pages/admin/users.tsx`.
+    * `[ ]` Build a data table to display all users with actions to edit their profile or change their role.
+* **Site Settings (`/admin/settings`)**
+    * `[ ]` Create the protected page `pages/admin/settings.tsx`.
+    * `[ ]` Build forms to update site-wide settings like the site name, logo, and SEO defaults.
+
+---
+
+### **Shared / Miscellaneous Pages & Components**
+
+* **Profile Settings (`/profile`)**
+    * `[ ]` Create the protected page `pages/profile.tsx` for all logged-in users.
+    * `[ ]` Build a form for users to update their email, username, and password.
+    * `[ ]` Build an avatar upload component.
+* **Error Pages**
+    * `[ ]` Create a custom `pages/404.tsx` page for "Not Found" errors.
+    * `[ ]` Create a generic `pages/error.tsx` page or component to handle other errors (like 403 Forbidden).
+* **Notification System**
+    * `[ ]` Build a `Notification` or `Toast` component.
+    * `[ ]` Integrate it into the global layout to display success or error messages from API calls.
 
 ***
 
