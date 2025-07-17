@@ -38,7 +38,7 @@ This phase creates the skeleton of your project, including architectural plannin
     * `[ ]` Create a `Dockerfile` inside the `./frontend` directory for the Next.js app.
     * `[ ]` Run `npx create-next-app@latest ./frontend` to initialize the Next.js project.
 
-***
+---
 
 ## Phase 2: Backend Development (FastAPI) 🐍
 
@@ -69,71 +69,112 @@ This phase builds all the API endpoints and database logic.
     * `[ ]` Create Admin-only endpoints for user management (e.g., `GET /users`, `PUT /users/{user_id}/role`).
     * `[ ]` Create an Admin-only endpoint for statistics (`GET /admin/stats`).
 
-***
+---
 
-## Phase 3: Frontend Development (Next.js) ⚛️
+## Phase 3: Frontend Development & Feature Implementation ⚛️
 
-This phase builds the user interface and connects it to the backend API.
+This unified phase covers the entire frontend build, from initial setup to the creation and integration of all pages and their specific components, feature by feature.
 
-* **Styling & Layout**
+### **Part 3.1: Frontend Foundation & Global Setup**
+
+* **Styling & Global Layout**
     * `[ ]` Set up Tailwind CSS within the Next.js project.
     * `[ ]` Configure `tailwind.config.js` with the custom color palette (`#24282B`, `#E8E2D9`, `#5C3D2E`, etc.).
-    * `[ ]` Create a main `Layout` component that includes a navbar and footer.
-    * `[ ]` Build a responsive Navbar component.
-    * `[ ]` Build a Footer component.
-* **Pages & Routing**
-    * `[ ]` Create the homepage file (`/pages/index.tsx`) to display a list of recent posts.
-    * `[ ]` Create the dynamic blog post page (`/pages/blog/[slug].tsx`).
-    * `[ ]` Create the login page (`/pages/login.tsx`) with a form.
-    * `[ ]` Create the registration page (`/pages/register.tsx`) with a form.
-    * `[ ]` Create dynamic pages for categories and tags (`/pages/category/[slug].tsx`).
-* **State Management & API Calls**
-    * `[ ]` Set up a global state management solution (e.g., React Context or Zustand) for user authentication state.
-    * `[ ]` Create a typed API client or service functions to fetch data from the FastAPI backend.
-    * `[ ]` Implement the login form logic to call the `/auth/token` endpoint and store the token.
-* **Component Building**
-    * `[ ]` Build a `PostCard` component for displaying post previews.
-    * `[ ]` Build a `Comment` component to display a single comment.
-    * `[ ]` Build a `CommentForm` component, visible only to logged-in users.
-    * `[ ]` Build reusable Form components (Input, Button) based on the style guide.
+    * `[ ]` Build a responsive `Navbar` component.
+    * `[ ]` Build a `Footer` component.
+    * `[ ]` Create a main `Layout` component that wraps page content with the `Navbar` and `Footer`.
+* **Global State & API Services**
+    * `[ ]` Set up a global state management solution (e.g., React Context) for user authentication state.
+    * `[ ]` Create a typed API client or a set of service functions in a `/lib` directory to handle all calls to the FastAPI backend.
 
-***
+### **Part 3.2: Public Pages & Components**
 
-## Phase 4: Integration & Feature Completion 🔗
-
-This phase focuses on building the frontend pages and components, integrating them with the backend API, and implementing the complete feature set for each user role.
-
-### **Public Pages (No Login Required)**
-
-* **Home / Landing Page (`/`)**
-    * `[ ]` In `pages/index.tsx`, implement `getServerSideProps` to fetch the latest or featured posts from the backend.
-    * `[ ]` Build a `Hero` component for the top of the page (optional).
-    * `[ ]` Build a `FeaturedPostsGrid` component that uses the `PostCard` component to display posts.
-    * `[ ]` Build a `SearchBar` component (UI only for now).
-    * `[ ]` Build a `CategoriesList` component that fetches and displays all categories as links.
-* **Article Listing Page (`/blog`)**
+* **Home / Landing Page**
+    * `[ ]` Create the page file `pages/index.tsx`.
+    * `[ ]` Implement `getServerSideProps` to fetch the latest posts.
+    * `[ ]` Build a `PostCard` component to display a single post preview (title, author, image, excerpt).
+    * `[ ]` Build a `FeaturedPostsGrid` component that maps over the fetched data and uses the `PostCard` component.
+    * `[ ]` Build a `SearchBar` component (UI only).
+    * `[ ]` Build a `CategoriesList` component that links to category pages.
+* **Article Listing Page**
     * `[ ]` Create the page file `pages/blog/index.tsx`.
-    * `[ ]` Implement `getServerSideProps` to fetch the first page of published articles.
+    * `[ ]` Implement `getServerSideProps` for paginated article fetching.
     * `[ ]` Build a `FilterControls` component with dropdowns for categories and tags.
-    * `[ ]` Implement state management for search and filter values.
-    * `[ ]` Update the data fetching logic to include pagination and pass filter parameters to the API.
-    * `[ ]` Build a `Pagination` component for navigating between pages of articles.
-* **Article Detail Page (`/blog/[slug]`)**
-    * `[ ]` In `pages/blog/[slug].tsx`, use `getServerSideProps` to fetch the specific post, its author, and comments.
-    * `[ ]` Build an `ArticleHeader` component to display the post title, author link, date, and categories/tags.
-    * `[ ]` Build an `ArticleBody` component to safely render the post's HTML or Markdown content.
-    * `[ ]` Build a `CommentThread` component to display the list of comments.
-    * `[ ]` Integrate the `CommentForm` component, ensuring it is disabled or hidden if the user is not logged in.
-    * `[ ]` Use the `Head` component to dynamically set the `title` and `meta description` for SEO.
-* **Author Profile Page (`/author/[id]`)**
+    * `[ ]` Build a `Pagination` component for page navigation.
+    * `[ ]` Assemble the page using the `FilterControls`, `PostCard` grid, and `Pagination` components.
+* **Article Detail Page**
+    * `[ ]` Create the dynamic page file `pages/blog/[slug].tsx`.
+    * `[ ]` Implement `getServerSideProps` to fetch the single post, its author, and comments.
+    * `[ ]` Build an `ArticleHeader` component (title, author link, date).
+    * `[ ]` Build an `ArticleBody` component to render the post's content.
+    * `[ ]` Build a `Comment` component to display a single comment.
+    * `[ ]` Build a `CommentThread` component that maps and displays a list of `Comment` components.
+    * `[ ]` Build a `CommentForm` component, which is visibly disabled or hidden for non-logged-in users.
+    * `[ ]` Use the `Head` component to set dynamic SEO metadata.
+* **Author Profile Page**
     * `[ ]` Create the dynamic page file `pages/author/[id].tsx`.
-    * `[ ]` Implement `getServerSideProps` to fetch the author's public profile data and their published posts.
-    * `[ ]` Build an `AuthorBio` component to display their name, avatar, and bio.
-    * `[ ]` Reuse the `PostCard` component to create a grid of the author's articles.
+    * `[ ]` Implement `getServerSideProps` to fetch the author's data and their posts.
+    * `[ ]` Build an `AuthorBio` component.
+    * `[ ]` Assemble the page using the `AuthorBio` and a grid of `PostCard` components.
 * **Static Pages**
-    * `[ ]` Create the `pages/about.tsx` page with static informational content.
-    * `[ ]` Create the `pages/contact.tsx` page and integrate a contact form component.
-    * `[ ]` Create the `pages/terms.tsx` and `pages/privacy.tsx` pages.
+    * `[ ]` Create the `pages/about.tsx`, `pages/contact.tsx`, `pages/terms.tsx`, and `pages/privacy.tsx` pages with static content.
+
+---
+
+### **Part 3.3: Authentication Pages & Components**
+
+* **Login & Register Pages**
+    * `[ ]` Build a reusable `InputField` component.
+    * `[ ]` Build a reusable `Button` component based on the style guide.
+    * `[ ]` Create the `pages/login.tsx` page, assembling the form with `InputField` and `Button` components.
+    * `[ ]` Implement the login `onSubmit` handler to call the API service.
+    * `[ ]` Create the `pages/register.tsx` page and form.
+* **Forgot/Reset Password Pages**
+    * `[ ]` Create the `pages/forgot-password.tsx` page and its associated form.
+    * `[ ]` Create the dynamic `pages/reset-password/[token].tsx` page and its associated form.
+
+---
+
+### **Part 3.4: Writer Pages & Components (Role-Protected)**
+
+* **Writer Dashboard**
+    * `[ ]` Create a `withAuth` Higher-Order Component (HOC) or use a similar pattern to protect pages based on user role.
+    * `[ ]` Create the protected page `pages/writer/dashboard.tsx`.
+    * `[ ]` Build a `DashboardStatCard` component.
+    * `[ ]` Build a `WriterPostTable` component to list drafts and published posts with action buttons.
+    * `[ ]` Assemble the dashboard using these components.
+* **Create/Edit Post Page**
+    * `[ ]` Create the protected page `pages/writer/editor/[id].tsx`.
+    * `[ ]` Build or integrate a rich text `Editor` component.
+    * `[ ]` Build a `CategoryTagSelector` component for associating taxonomies.
+    * `[ ]` Build an `ImageUpload` component.
+    * `[ ]` Assemble the editor page and implement the save/publish logic.
+
+---
+
+### **Part 3.5: Admin Pages & Components (Role-Protected)**
+
+* **Admin Dashboard & Management Pages**
+    * `[ ]` Build a generic, reusable `DataTable` component with features for sorting, filtering, and actions.
+    * `[ ]` Build a `Chart` component by wrapping a library like Recharts.
+    * `[ ]` Create the protected admin pages (`/admin/dashboard`, `/admin/articles`, `/admin/users`, etc.).
+    * `[ ]` On each management page, configure the `DataTable` component to display the appropriate data (users, posts, etc.) and handle the specific actions (delete, change role).
+* **Site Settings Page**
+    * `[ ]` Create the protected page `pages/admin/settings.tsx`.
+    * `[ ]` Build a `SettingsForm` component to manage site-wide configuration.
+
+---
+
+### **Part 3.6: Shared Pages & Components**
+
+* **Profile Settings Page**
+    * `[ ]` Create the protected page `pages/profile.tsx`.
+    * `[ ]` Build an `UpdateProfileForm` component.
+    * `[ ]` Build a `ChangePasswordForm` component.
+* **Error & Notification Components**
+    * `[ ]` Create a custom `pages/404.tsx` page.
+    * `[ ]` Build a `Toast` or `Notification` component to provide user feedback after actions.
+    * `[ ]` Integrate the `Notification` component into the main `Layout`.
 
 ---
 
