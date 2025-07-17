@@ -42,32 +42,65 @@ This phase creates the skeleton of your project, including architectural plannin
 
 ## Phase 2: Backend Development (FastAPI) 🐍
 
-This phase builds all the API endpoints and database logic.
+This phase builds the entire backend API, from establishing a robust database connection to defining every endpoint and security measure.
 
-* **Database & ORM Setup**
-    * `[ ]` Establish the database connection logic using SQLAlchemy.
-    * `[ ]` Create a base model class and session management for the database.
-    * `[ ]` Create the `users` table model with columns for `id`, `email`, `hashed_password`, and `role` (using an `Enum` type for 'reader', 'writer', 'admin').
-    * `[ ]` Create the `posts` table model with columns for `id`, `title`, `slug`, `content`, `status`, `author_id` (foreign key to users).
-    * `[ ]` Create the `comments` table model with columns for `id`, `content`, `author_id`, and `post_id`.
-    * `[ ]` Create the `categories` and `tags` table models.
-    * `[ ]` Create the `post_categories` and `post_tags` join tables for many-to-many relationships.
-* **User Authentication & Authorization**
-    * `[ ]` Create Pydantic schemas for User creation, User display, and Token data.
-    * `[ ]` Implement password hashing functions using `passlib`.
-    * `[ ]` Create the `/auth/register` endpoint to register a new user (default role 'reader').
-    * `[ ]` Create the `/auth/token` endpoint for user login, which returns a JWT access token.
-    * `[ ]` Implement JWT token creation and decoding functions.
-    * `[ ]` Create a dependency function `get_current_user` to validate the JWT and return the user model.
-    * `[ ]` Create dependency functions for role checks (`is_reader`, `is_writer`, `is_admin`) based on the current user.
-* **API Endpoints**
-    * `[ ]` Create CRUD endpoints for `/posts` protected by the `is_writer` dependency.
-    * `[ ]` Implement ownership check logic within the update/delete post endpoints.
-    * `[ ]` Create public endpoints `GET /posts` and `GET /posts/{slug}` to fetch published articles.
-    * `[ ]` Create CRUD endpoints for `/comments` protected by the `is_reader` dependency.
-    * `[ ]` Create Admin-only CRUD endpoints for `/categories` and `/tags`.
-    * `[ ]` Create Admin-only endpoints for user management (e.g., `GET /users`, `PUT /users/{user_id}/role`).
-    * `[ ]` Create an Admin-only endpoint for statistics (`GET /admin/stats`).
+### **Part 2.1: Core Configuration & Database Setup**
+
+* **Project Configuration**
+    * `[ ]` Create a `core` directory within the `app` folder.
+    * `[ ]` Inside `core`, create a `config.py` file to manage settings.
+    * `[ ]` In `config.py`, define a `Settings` class (using Pydantic) to load environment variables like `DATABASE_URL`, `SECRET_KEY`, and `ALGORITHM`.
+* **Database Connection & Session Management**
+    * `[ ]` Create a `db` directory within the `app` folder.
+    * `[ ]` Inside `db`, create a `session.py` file.
+    * `[ ]` In `session.py`, use the `DATABASE_URL` from your settings to create the SQLAlchemy `engine`.
+    * `[ ]` In `session.py`, define the `SessionLocal` factory for creating database sessions.
+    * `[ ]` In `session.py`, create the `Base` class using `declarative_base()` that all your models will inherit from.
+* **Database Dependency & Initialization**
+    * `[ ]` Inside the `db` directory, create a `dependencies.py` file.
+    * `[ ]` In `db/dependencies.py`, define the `get_db` dependency function that yields a database session for each API request.
+    * `[ ]` Inside the `db` directory, create an `init_db.py` script. This script will contain a function to create all tables in the database by importing the `Base` and all defined models.
+
+### **Part 2.2: Data Models & Schemas**
+
+* **User Model & Schemas**
+    * `[ ]` Create a `models` directory and a `schemas` directory within the `app` folder.
+    * `[ ]` In `models/user.py`, define the `User` SQLAlchemy model with columns for `id`, `email`, `hashed_password`, and `role`.
+    * `[ ]` In `schemas/user.py`, define the Pydantic schemas: `UserCreate`, `UserUpdate`, and `UserInDB`.
+* **Post Model & Schemas**
+    * `[ ]` In `models/post.py`, define the `Post` SQLAlchemy model with columns for `title`, `slug`, `content`, `status`, `author_id`, etc.
+    * `[ ]` In `schemas/post.py`, define the Pydantic schemas: `PostCreate`, `PostUpdate`, and `PostInDB`.
+* **Taxonomy & Comment Models & Schemas**
+    * `[ ]` In `models/comment.py`, define the `Comment` SQLAlchemy model.
+    * `[ ]` In `models/taxonomy.py`, define the `Category` and `Tag` SQLAlchemy models, along with the necessary join tables.
+    * `[ ]` Create corresponding Pydantic schemas for comments, categories, and tags in the `schemas` directory.
+* **Statistics Model & Schemas**
+    * `[ ]` In `models/stats.py`, define a `PageView` SQLAlchemy model with columns for `id`, `post_id` (foreign key to posts), and `timestamp`. This will allow for tracking views over time.
+    * `[ ]` In `schemas/stats.py`, define Pydantic schemas for returning analytics data, such as `SiteSummary` and `TopPost`.
+
+---
+
+### **Part 2.4: API Endpoint Routers**
+
+* **Posts Router**
+    * `[ ]` In `api/endpoints`, create a `posts.py` file with its own APIRouter.
+    * `[ ]` Define the public `GET` routes to list all published posts.
+    * `[ ]` Define the public `GET` route for a single post (`/posts/{slug}`).
+    * `[ ]` **Inside the single post route, add logic to create a new `PageView` record for that post to log the view.**
+    * `[ ]` Define the `POST`, `PUT`, and `DELETE` routes for creating and managing posts, protecting them with the writer-role dependency.
+* **Comments Router**
+    * `[ ]` In `api/endpoints`, create a `comments.py` file with its own APIRouter.
+    * `[ ]` Define the `POST` route for creating a comment, protected by a general logged-in user dependency.
+    * `[ ]` Define the `DELETE` route for a comment, ensuring it checks for comment ownership or admin privileges.
+* **Admin Router**
+    * `[ ]` In `api/endpoints`, create an `admin.py` file with its own APIRouter.
+    * `[ ]` Define all endpoints for managing users, categories, and tags within this router. Protect every endpoint with the `get_current_admin_user` dependency.
+    * `[ ]` **Create a `GET` endpoint for site summary stats (`/admin/stats/summary`)**. This will query the database for total user, post, and comment counts.
+    * `[ ]` **Create a `GET` endpoint for top posts (`/admin/stats/top-posts`)**. This will aggregate data from the `pageviews` table to find the most viewed articles.
+    * `[ ]` **Create a `GET` endpoint for views over time (`/admin/stats/views-over-time`)**. This will query the `pageviews` table to return time-series data suitable for a chart.
+* **Main Application Assembly**
+    * `[ ]` In `app/main.py`, import all the routers (auth, posts, comments, admin).
+    * `[ ]` In `app/main.py`, include each router into the main FastAPI app instance.
 
 ---
 
