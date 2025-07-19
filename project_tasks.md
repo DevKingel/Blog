@@ -11,6 +11,7 @@ This phase creates the skeleton of your project, including architectural plannin
         * **Key Components:** `Navbar`, `Footer`, `PostCard`, `CommentList`, `CommentForm`.
 * **Project Initialization**
     * `[ ]` Create a root project directory.
+        * `[ ]` Create all the folders and files listed in the project_structure.md
     * `[ ]` Initialize a `git` repository in the root directory.
     * `[ ]` Create a `.gitignore` file with appropriate entries for Python, Node.js, and OS-specific files.
     * `[ ]` Create a main `README.md` file with the project title.
@@ -63,8 +64,9 @@ This phase builds the entire backend API, from establishing a robust database co
 
 ### **Part 2.2: Data Models & Schemas**
 
-* **User Model & Schemas**
+* **Folder**
     * `[ ]` Create a `models` directory and a `schemas` directory within the `app` folder.
+* **User Model & Schemas**
     * `[ ]` In `models/user.py`, define the `User` SQLAlchemy model with columns for `id`, `email`, `hashed_password`, and `role`.
     * `[ ]` In `schemas/user.py`, define the Pydantic schemas: `UserCreate`, `UserUpdate`, and `UserInDB`.
 * **Post Model & Schemas**
@@ -92,6 +94,7 @@ This phase builds the entire backend API, from establishing a robust database co
     * `[ ]` In `api/endpoints`, create a `comments.py` file with its own APIRouter.
     * `[ ]` Define the `POST` route for creating a comment, protected by a general logged-in user dependency.
     * `[ ]` Define the `DELETE` route for a comment, ensuring it checks for comment ownership or admin privileges.
+    * `[ ]` Define the `PUT` route for modifying a comment, ensuring it checks for comment ownership privileges.
 * **Admin Router**
     * `[ ]` In `api/endpoints`, create an `admin.py` file with its own APIRouter.
     * `[ ]` Define all endpoints for managing users, categories, and tags within this router. Protect every endpoint with the `get_current_admin_user` dependency.
@@ -112,7 +115,12 @@ This unified phase covers the entire frontend build, from initial setup to the c
 
 * **Styling & Global Layout**
     * `[ ]` Set up Tailwind CSS within the Next.js project.
-    * `[ ]` Configure `tailwind.config.js` with the custom color palette (`#24282B`, `#E8E2D9`, `#5C3D2E`, etc.).
+    * `[ ]` Configure `tailwind.config.js` with the custom color palette : Based on your themes of plants, wood, mountains, and steampunk, here is a proposed eye-friendly, modern color scheme :
+        * `[ ]` Background: #24282B (Dark Charcoal) - A deep, dark base that's easy on the eyes.
+        * `[ ]` Text: #E8E2D9 (Alabaster) - A soft, off-white for high readability without harsh contrast.
+        * `[ ]` Primary (Wood & Earth): #5C3D2E (Deep Coffee) - For major UI components like footers or sidebars.
+        * `[ ]` Secondary (Plants): #364B44 (Brunswick Green) - For secondary elements and accents.
+        * `[ ]` Accent (Steampunk Brass): #C8A870 (Antique Brass) - For critical interactive elements like buttons and links to draw user attention.
     * `[ ]` Build a responsive `Navbar` component.
     * `[ ]` Build a `Footer` component.
     * `[ ]` Create a main `Layout` component that wraps page content with the `Navbar` and `Footer`.
