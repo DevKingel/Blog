@@ -31,35 +31,7 @@
 
 ---
 
-## 3\. 🧩 Tasks & Priorities for MVP
-
-| ID  | Title                                                         | Priority | User Story ID  | Dependencies | Status |
-| --- | ------------------------------------------------------------- | -------- | -------------- | ------------ | ------ |
-| T01 | Setup Docker environment for all services                     | High     | -              |              | To Do  |
-| T02 | Design and implement User & Role DB Schema (Many-to-Many)     | High     | US-001, US-006 |              | To Do  |
-| T03 | Implement User Authentication API (FastAPI)                   | High     | US-001         | T02          | To Do  |
-| T04 | Create Login/Register Page UI (Next.js)                       | High     | US-001         | T03          | To Do  |
-| T05 | Design and implement Article DB Schema                        | High     | US-002         |              | To Do  |
-| T06 | Implement Article CRUD API (FastAPI)                          | High     | US-002         | T05          | To Do  |
-| T07 | Create "New Post" and "Edit Post" UI (Next.js)                | High     | US-002         | T06          | To Do  |
-| T08 | Implement Public Article View (Next.js with SSR)              | High     | US-003         | T06          | To Do  |
-| T09 | Implement Redis caching for articles                          | Medium   | -              | T06          | To Do  |
-| T10 | Design and implement Comments DB Schema                       | Medium   | US-004         |              | To Do  |
-| T11 | Implement Comments API (FastAPI)                              | Medium   | US-004         | T10          | To Do  |
-| T12 | Implement Comments section UI (Next.js)                       | Medium   | US-004         | T11          | To Do  |
-| T13 | Design and implement Category & Tags DB Schema                | High     | US-005         | T05          | To Do  |
-| T14 | Implement Category & Tags CRUD API (FastAPI)                  | High     | US-005         | T13          | To Do  |
-| T15 | Update "New/Edit Post" UI for Category/Tag selection          | High     | US-002         | T07, T14     | To Do  |
-| T16 | Implement pages to view articles by Category/Tag              | Medium   | US-005         | T14          | To Do  |
-| T17 | Design Admin Panel UI                                         | High     | US-006         |              | To Do  |
-| T18 | Implement Admin API endpoints (metrics, user/role management) | High     | US-006         | T02          | To Do  |
-| T19 | Implement Role-Based Access Control (RBAC) in API             | High     | US-006         | T03          | To Do  |
-| T20 | Design User Settings Page UI                                  | Medium   | US-007         |              | To Do  |
-| T21 | Implement User Settings API endpoints                         | Medium   | US-007         | T03          | To Do  |
-
----
-
-## 4\. 🧰 Tech Stack
+## 3\. 🧰 Tech Stack
 
 ### Languages
 
@@ -83,7 +55,7 @@
 
 ---
 
-## 5\. 🌱 Environment Variables
+## 4\. 🌱 Environment Variables
 
 -   `POSTGRES_USER`: **Purpose:** Username for the PostgreSQL database.
 -   `POSTGRES_PASSWORD`: **Purpose:** Password for the PostgreSQL database.
@@ -109,7 +81,7 @@
 
 ---
 
-## 6\. 🧱 Architecture
+## 5\. 🧱 Architecture
 
 -   **Diagram:**  (A diagram showing Next.js client, FastAPI backend, PostgreSQL DB, and Redis cache as separate, containerized services).
 ![Architecture diagram](/docs/images/architecture.png)
@@ -141,7 +113,7 @@
 
 ---
 
-## 7\. 🎨 UI/UX Design
+## 6\. 🎨 UI/UX Design
 
 ### Principles
 
@@ -180,7 +152,7 @@
 
 ---
 
-## 8\. 👤 User Stories
+## 7\. 👤 User Stories
 
 -   **US-001: User Registration**
 
@@ -247,7 +219,7 @@
 
 ---
 
-## 9\. ✅ Acceptance Tests
+## 8\. ✅ Acceptance Tests
 
 -   **AT-001: Successful Registration & Login**
 
@@ -272,7 +244,7 @@
 
 ---
 
-## 10\. ⚡ Performance & SEO
+## 9\. ⚡ Performance & SEO
 
 -   **Performance Budget:**
     -   **LCP:** < 2.5s
@@ -286,7 +258,7 @@
 
 ---
 
-## 11\. 🗄️ Database Schema
+## 10\. 🗄️ Database Schema
 
 ### `roles` table
 
@@ -351,14 +323,14 @@
 
 ---
 
-## 12\. 🔌 Integrations
+## 11\. 🔌 Integrations
 
 -   **Email Service:** (Optional for MVP)
 -   **Image Storage:** (Optional for MVP)
 
 ---
 
-## 13\. 🔍 Observability & Ops
+## 12\. 🔍 Observability & Ops
 
 ### Logging
 
@@ -374,7 +346,7 @@
 
 ---
 
-## 14\. 🔄 CI/CD
+## 13\. 🔄 CI/CD
 
 -   **Provider:** GitHub Actions
 -   **Workflows:**
@@ -388,7 +360,7 @@
 
 ---
 
-## 15\. 📚 Documentation
+## 14\. 📚 Documentation
 
 -   **API Documentation:** Automatically generated and served by FastAPI at `/docs`.
 -   **README.md:** Detailed instructions for setting up and running the project locally using Docker.
@@ -396,7 +368,7 @@
 
 ---
 
-## 16\. 🔐 Security
+## 15\. 🔐 Security
 
 -   **Authentication:** JWT-based authentication. Access tokens will be short-lived, with a refresh token mechanism.
 -   **Authorization:** Role-based access control (RBAC) will be implemented in the FastAPI backend. API endpoints will be protected by dependencies that verify the user has the required role (e.g., 'WRITER', 'ADMIN') in their list of assigned roles.
@@ -408,7 +380,7 @@
 
 ---
 
-## 17\. 🧭 Governance
+## 16\. 🧭 Governance
 
 -   **Versioning Policy:** Semantic Versioning.
 -   **Code Style:** `black` and `isort` for Python, `prettier` for JavaScript/TypeScript.
@@ -418,7 +390,7 @@
 
 ---
 
-## 18\. ⚙️ Environment Configuration
+## 17\. ⚙️ Environment Configuration
 
 This project will require separate configurations for different environments to ensure security and proper behavior.
 
@@ -454,35 +426,3 @@ The `compose.override.yaml` file is designed for an interactive and flexible dev
     *   **Workflow:** This service does not run continuously. It is started on-demand by the developer to execute the test suite against the running frontend and backend services using a command like `docker-compose run --rm playwright npx playwright test`.
 
 ---
-
-## 19\. 📁 Suggested Directory Structure
-
-```
-blog-app/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── core/
-│   │   ├── db/
-│   │   └── main.py
-│   ├── Dockerfile
-│   └── requirements.txt
-├── frontend/
-│   ├── app/
-│   │   ├── (admin)/
-│   │   ├── (user)/
-│   │   └── (public)/
-│   ├── components/
-│   ├── public/
-│   ├── Dockerfile
-│   └── package.json
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       └── deploy.yml
-├── docs/
-│   └── architecture.png
-├── docker-compose.yml
-├── docker-compose.dev.yml
-└── README.md
-```
