@@ -24,22 +24,26 @@ your-blog-project/
 │       ├── db/
 │       │   ├── __init__.py
 │       │   ├── session.py       # SQLAlchemy engine and SessionLocal setup
-│       │   ├── dependencies.py    # get_db dependency to provide sessions to endpoints
+│       │   ├── dependencies.py  # get_db dependency to provide sessions to endpoints
 │       │   └── init_db.py       # Script to create initial database tables
 │       ├── models/
 │       │   ├── __init__.py
-│       │   ├── user.py          # User SQLAlchemy model
-│       │   ├── post.py          # Post SQLAlchemy model
-│       │   ├── comment.py       # Comment SQLAlchemy model
-│       │   ├── taxonomy.py      # Category and Tag SQLAlchemy models
-│       │   └── stats.py         # PageView SQLAlchemy model
+│       │   ├── user.py          # User model, including roles and auth provider info
+│       │   ├── post.py          # Article model, with creation/modification tracking
+│       │   ├── comment.py       # Comments on articles
+│       │   ├── category.py      # Category model
+│       │   ├── tag.py           # Tag model
+│       │   ├── article_tag.py   # Many-to-many relationship between articles and tags
+│       │   └── stats.py         # View and interaction statistics
 │       └── schemas/
 │           ├── __init__.py
-│           ├── user.py          # User Pydantic schemas (UserCreate, etc.)
-│           ├── post.py          # Post Pydantic schemas
-│           ├── comment.py       # Comment Pydantic schemas
-│           ├── taxonomy.py      # Category and Tag Pydantic schemas
-│           └── stats.py         # Stats Pydantic schemas for API responses
+│           ├── user.py          # Pydantic schemas for User, UserCreate, UserUpdate
+│           ├── post.py          # Pydantic schemas for Article CRUD
+│           ├── comment.py       # Pydantic schemas for Comment creation and response
+│           ├── category.py      # Pydantic schemas for categories
+|           ├── tag.py           # Pydantic schemas for tags
+|           ├── article_tag.py   # Pydantic schemas for the article-tag relationship
+│           └── stats.py         # ArticleStats schema
 ├── frontend/
 │   ├── Dockerfile             # Instructions to build the frontend Docker image
 │   ├── package.json           # List of Node.js dependencies
