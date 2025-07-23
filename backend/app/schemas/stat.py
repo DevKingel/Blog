@@ -3,20 +3,20 @@ from uuid import UUID, uuid4
 from typing import Optional
 
 
-class StatsBase(SQLModel):
+class StatBase(SQLModel):
     post_id: UUID
     views: int = 0
     likes: int = 0
 
 
-class StatsCreate(StatsBase):
+class StatsCreate(StatBase):
     pass
 
 
-class StatsRead(StatsBase):
+class StatsRead(StatBase):
     id: UUID
 
 
-class StatsUpdate(SQLModel):
+class StatUpdate(SQLModel):
     views: Optional[int] = None
     likes: Optional[int] = None
