@@ -17,14 +17,14 @@
 
 ## 2\. 🎯 Project Purpose
 
--   **What is being built?** A feature-rich blog application that allows users to create, publish, and share articles. It will also provide a great reading experience with features like comments and social sharing.
+-   **What is being built?** A feature-rich blog application that allows users to create, publish, and share posts. It will also provide a great reading experience with features like comments and social sharing.
 -   **Why is it being built?** To provide a modern, fast, and secure platform for content creators and readers, addressing the shortcomings of older, monolithic blogging platforms.
 -   **Who is it for?** Content creators (bloggers, writers, journalists), businesses that need a content marketing platform, and general readers.
 -   **What problems does it solve?** Slow load times, poor mobile experience, security vulnerabilities, and limited SEO capabilities found in many existing blog solutions.
--   **Success Metrics:** High user engagement, growth in the number of published articles, excellent performance metrics, and positive user feedback.
+-   **Success Metrics:** High user engagement, growth in the number of published posts, excellent performance metrics, and positive user feedback.
 -   **Key Performance Indicators (KPIs):**
     -   **User Engagement:** `Monthly Active Users (MAU) > 10,000`
-    -   **Content Growth:** `>100 new articles published per month`
+    -   **Content Growth:** `>100 new posts published per month`
     -   **Performance:** `Page Load Time (LCP) < 2.5s`, `API response time < 150ms for 99% of requests`
     -   **SEO:** `Top 10 ranking for target keywords within 6 months`
     -   **User Satisfaction:** `User satisfaction score > 8/10`
@@ -83,15 +83,15 @@
 
 ## 5\. 🧱 Architecture
 
--   **Diagram:**  (A diagram showing Next.js client, FastAPI backend, PostgreSQL DB, and Redis cache as separate, containerized services).
-![Architecture diagram](/docs/images/architecture.png)
+-   **Diagram:** (A diagram showing Next.js client, FastAPI backend, PostgreSQL DB, and Redis cache as separate, containerized services).
+    ![Architecture diagram](/docs/images/architecture.png)
 
 ### Modules
 
 -   **API Service (FastAPI):** Handles all business logic, RESTful API endpoints, and database interactions. Implements role-based access control.
 -   **Web Client (Next.js):** A Single Page Application (SPA) responsible for all UI rendering. Includes a public-facing site, a user settings area, and a protected admin panel. It will use Server-Side Rendering (SSR) for initial page loads for performance and SEO, and client-side rendering for subsequent navigation.
--   **Database (PostgreSQL):** The primary data store for users, roles, articles, comments, etc.
--   **Cache (Redis):** Used for caching frequently accessed data, such as published articles and site-wide metrics, to reduce database load and improve response times.
+-   **Database (PostgreSQL):** The primary data store for users, roles, posts, comments, etc.
+-   **Cache (Redis):** Used for caching frequently accessed data, such as published posts and site-wide metrics, to reduce database load and improve response times.
 
 ### API Specification
 
@@ -100,12 +100,12 @@
 ### Data Flow Example: Creating a New Post
 
 1.  A logged-in user with the 'WRITER' role submits the new post content from the `Web Client` (Next.js).
-2.  The `Web Client` sends a `POST` request with the article data (including `category_id` and an array of `tags`) and the user's JWT to the `API Service`'s `/api/v1/articles/` endpoint.
-3.  The `API Service` (FastAPI) validates the JWT, authorizes the user by checking for the 'WRITER' role, and validates the incoming article data.
-4.  The `API Service` saves the new article to the `PostgreSQL Database` and creates associations in the `article_tags` table.
+2.  The `Web Client` sends a `POST` request with the post data (including `category_id` and an array of `tags`) and the user's JWT to the `API Service`'s `/api/v1/posts/` endpoint.
+3.  The `API Service` (FastAPI) validates the JWT, authorizes the user by checking for the 'WRITER' role, and validates the incoming post data.
+4.  The `API Service` saves the new post to the `PostgreSQL Database` and creates associations in the `post_tags` table.
 5.  The `API Service` invalidates any relevant caches in `Redis`.
-6.  The `API Service` returns a `201 Created` response with the newly created article data.
-7.  The `Web Client` redirects the user to the newly created article page.
+6.  The `API Service` returns a `201 Created` response with the newly created post data.
+7.  The `Web Client` redirects the user to the newly created post page.
 
 ### State Management (Frontend)
 
@@ -125,9 +125,9 @@
 ### User Flows
 
 -   **`UF-001`: User Registration & Login**
--   **`UF-002`: Create and Publish a New Article**
--   **`UF-003`: Read an Article and View Comments**
--   **`UF-004`: Add a Comment to an Article**
+-   **`UF-002`: Create and Publish a New post**
+-   **`UF-003`: Read an post and View Comments**
+-   **`UF-004`: Add a Comment to an post**
 -   **`UF-005`: Filter Content by Category/Tag**
 -   **`UF-006`: Admin Manages Content & Views Metrics**
 -   **`UF-007`: User Modifies Profile Settings**
@@ -139,7 +139,7 @@
 ### Wireframes & Mockups
 
 -   `Home Page Wireframe`: \`\`
--   `Article Page Wireframe`: \`\`
+-   `post Page Wireframe`: \`\`
 -   `Admin Panel Mockup`: \`\`
 -   `User Settings Mockup`: \`\`
 -   `High-Fidelity Mockups`: \`\`
@@ -157,56 +157,56 @@
 -   **US-001: User Registration**
 
     -   **Title:** User can register for an account.
-    -   **Description:** As a new user, I want to create an account so that I can comment on articles.
+    -   **Description:** As a new user, I want to create an account so that I can comment on posts.
     -   **Acceptance Criteria:**
         -   User can register with a username, email, and password.
         -   User is assigned the default 'USER' role.
         -   User is automatically logged in upon successful registration.
 
--   **US-002: Article Creation**
+-   **US-002: post Creation**
 
-    -   **Title:** Writer can create and publish an article.
-    -   **Description:** As a logged-in user with the 'WRITER' role, I want to create, save as a draft, and publish an article.
+    -   **Title:** Writer can create and publish an post.
+    -   **Description:** As a logged-in user with the 'WRITER' role, I want to create, save as a draft, and publish an post.
     -   **Acceptance Criteria:**
-        -   A user with the 'WRITER' role can create a new article with a title, content (supporting Markdown), and a featured image.
-        -   A user must select one category for the article.
-        -   A user can add multiple, specific tags to the article.
-        -   A user can save an article as a draft or publish it.
-        -   Published articles are publicly accessible via a unique URL (slug).
-        -   Users without the 'WRITER' role cannot access the article creation/editing pages.
+        -   A user with the 'WRITER' role can create a new post with a title, content (supporting Markdown), and a featured image.
+        -   A user must select one category for the post.
+        -   A user can add multiple, specific tags to the post.
+        -   A user can save an post as a draft or publish it.
+        -   Published posts are publicly accessible via a unique URL (slug).
+        -   Users without the 'WRITER' role cannot access the post creation/editing pages.
 
--   **US-003: Article Reading**
+-   **US-003: post Reading**
 
-    -   **Title:** Any user can read a published article.
-    -   **Description:** As a visitor, I want to be able to read published articles without needing an account.
+    -   **Title:** Any user can read a published post.
+    -   **Description:** As a visitor, I want to be able to read published posts without needing an account.
     -   **Acceptance Criteria:**
-        -   The article page loads quickly (SSR).
+        -   The post page loads quickly (SSR).
         -   The content is well-formatted and easy to read.
 
 -   **US-004: Commenting**
 
-    -   **Title:** Logged-in user can comment on an article.
-    -   **Description:** As a logged-in user, I want to add comments to articles to engage in discussions.
+    -   **Title:** Logged-in user can comment on an post.
+    -   **Description:** As a logged-in user, I want to add comments to posts to engage in discussions.
     -   **Acceptance Criteria:**
-        -   Any logged-in user (regardless of role) can submit a comment on an article.
-        -   Comments are displayed below the article content.
+        -   Any logged-in user (regardless of role) can submit a comment on an post.
+        -   Comments are displayed below the post content.
 
 -   **US-005: Content Discovery**
 
-    -   **Title:** Filter articles by category or tag.
-    -   **Description:** As a user, I want to see all articles belonging to a specific category or tag so I can discover content relevant to my interests.
+    -   **Title:** Filter posts by category or tag.
+    -   **Description:** As a user, I want to see all posts belonging to a specific category or tag so I can discover content relevant to my interests.
     -   **Acceptance Criteria:**
-        -   Clicking on a category name shows all articles in that category.
-        -   Clicking on a tag shows all articles with that tag.
+        -   Clicking on a category name shows all posts in that category.
+        -   Clicking on a tag shows all posts with that tag.
 
 -   **US-006: Admin Management**
 
     -   **Title:** Admin can manage content, users, and view site metrics.
-    -   **Description:** As an Admin, I want to access a protected dashboard to manage all articles, assign roles to users, and view analytics so I can moderate the platform.
+    -   **Description:** As an Admin, I want to access a protected dashboard to manage all posts, assign roles to users, and view analytics so I can moderate the platform.
     -   **Acceptance Criteria:**
         -   Only users with the 'ADMIN' role can access the `/admin` route.
         -   The admin panel displays key metrics.
-        -   The admin can perform CRUD operations on any article.
+        -   The admin can perform CRUD operations on any post.
         -   The admin can assign/revoke roles for any user.
 
 -   **US-007: User Profile Management**
@@ -227,11 +227,11 @@
     -   **Steps:** Navigate to `/register`, fill in the form, submit.
     -   **Expected Result:** User is redirected to their dashboard/homepage and their session is active.
 
--   **AT-002: Article Creation Access Control**
+-   **AT-002: post Creation Access Control**
 
     -   **Related Story:** `US-002`
     -   **Steps:** Login as a user with the 'WRITER' role. Navigate to `/posts/new`.
-    -   **Expected Result:** The article creation page is displayed.
+    -   **Expected Result:** The post creation page is displayed.
     -   **Steps (Negative):** Login as a user with only the 'USER' role. Navigate to `/posts/new`.
     -   **Expected Result:** Access is denied.
 
@@ -251,9 +251,9 @@
     -   **FID:** < 100ms
     -   **CLS:** < 0.1
 -   **SEO Strategy:**
-    -   **Server-Side Rendering (SSR):** All public pages (homepage, article pages, category/tag pages) will be server-rendered for fast initial load and full indexability by search engines.
+    -   **Server-Side Rendering (SSR):** All public pages (homepage, post pages, category/tag pages) will be server-rendered for fast initial load and full indexability by search engines.
     -   **Metadata:** Dynamic generation of `<title>`, `<meta description>`, and other relevant meta tags for each page.
-    -   **Structured Data:** Use of JSON-LD for rich snippets (e.g., for articles).
+    -   **Structured Data:** Use of JSON-LD for rich snippets (e.g., for posts).
     -   **Sitemap:** Automatic generation of `sitemap.xml`.
 
 ---
@@ -300,26 +300,40 @@
 | `name` | `VARCHAR(100)` | `NOT NULL`, `UNIQUE` | Name of the tag (e.g., nodejs) |
 | `slug` | `VARCHAR(100)` | `NOT NULL`, `UNIQUE` | URL-friendly slug for the tag  |
 
-### `articles` table
+### `posts` table
 
-| Column         | Data Type      | Constraints                              | Description                       |
-| -------------- | -------------- | ---------------------------------------- | --------------------------------- |
-| `id`           | `UUID`         | `PRIMARY KEY`                            | Unique identifier for the article |
-| `author_id`    | `UUID`         | `NOT NULL`, `FOREIGN KEY(users.id)`      | ID of the authoring user          |
-| `category_id`  | `UUID`         | `NOT NULL`, `FOREIGN KEY(categories.id)` | ID of the article's category      |
-| `slug`         | `VARCHAR(255)` | `NOT NULL`, `UNIQUE`                     | URL-friendly slug for the article |
-| `title`        | `VARCHAR(255)` | `NOT NULL`                               | Title of the article              |
-| `content`      | `TEXT`         | `NOT NULL`                               | Content of the article (Markdown) |
-| `is_published` | `BOOLEAN`      | `NOT NULL`, `DEFAULT FALSE`              | Whether the article is published  |
-| `created_at`   | `TIMESTAMPTZ`  | `NOT NULL`, `DEFAULT NOW()`              | Timestamp of record creation      |
-| `updated_at`   | `TIMESTAMPTZ`  | `NOT NULL`, `DEFAULT NOW()`              | Timestamp of last record update   |
+| Column         | Data Type      | Constraints                              | Description                     |
+| -------------- | -------------- | ---------------------------------------- | ------------------------------- |
+| `id`           | `UUID`         | `PRIMARY KEY`                            | Unique identifier for the post  |
+| `author_id`    | `UUID`         | `NOT NULL`, `FOREIGN KEY(users.id)`      | ID of the authoring user        |
+| `category_id`  | `UUID`         | `NOT NULL`, `FOREIGN KEY(categories.id)` | ID of the post's category       |
+| `slug`         | `VARCHAR(255)` | `NOT NULL`, `UNIQUE`                     | URL-friendly slug for the post  |
+| `title`        | `VARCHAR(255)` | `NOT NULL`                               | Title of the post               |
+| `content`      | `TEXT`         | `NOT NULL`                               | Content of the post (Markdown)  |
+| `is_published` | `BOOLEAN`      | `NOT NULL`, `DEFAULT FALSE`              | Whether the post is published   |
+| `created_at`   | `TIMESTAMPTZ`  | `NOT NULL`, `DEFAULT NOW()`              | Timestamp of record creation    |
+| `updated_at`   | `TIMESTAMPTZ`  | `NOT NULL`, `DEFAULT NOW()`              | Timestamp of last record update |
 
-### `article_tags` (Join Table)
+### `post_tags` (Join Table)
 
-| Column       | Data Type | Constraints                               | Description       |
-| ------------ | --------- | ----------------------------------------- | ----------------- |
-| `article_id` | `UUID`    | `PRIMARY KEY`, `FOREIGN KEY(articles.id)` | ID of the article |
-| `tag_id`     | `UUID`    | `PRIMARY KEY`, `FOREIGN KEY(tags.id)`     | ID of the tag     |
+| Column    | Data Type | Constraints                            | Description    |
+| --------- | --------- | -------------------------------------- | -------------- |
+| `post_id` | `UUID`    | `PRIMARY KEY`, `FOREIGN KEY(posts.id)` | ID of the post |
+| `tag_id`  | `UUID`    | `PRIMARY KEY`, `FOREIGN KEY(tags.id)`  | ID of the tag  |
+
+Of course! Here is the completed database schema with the `comments` table you requested.
+
+### `comments` table
+
+| Column              | Data Type     | Constraints                                  | Description                            |
+| ------------------- | ------------- | -------------------------------------------- | -------------------------------------- |
+| `id`                | `UUID`        | `PRIMARY KEY`                                | Unique identifier for the comment      |
+| `user_id`           | `UUID`        | `NOT NULL`, `FOREIGN KEY(users.id)`          | ID of the authoring user               |
+| `post_id`           | `UUID`        | `NOT NULL`, `FOREIGN KEY(posts.id)`          | ID of the post being commented on      |
+| `parent_comment_id` | `UUID`        | `FOREIGN KEY(comments.id) ON DELETE CASCADE` | ID of the parent comment (for replies) |
+| `content`           | `TEXT`        | `NOT NULL`                                   | Content of the comment                 |
+| `created_at`        | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT NOW()`                  | Timestamp of record creation           |
+| `updated_at`        | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT NOW()`                  | Timestamp of last record update        |
 
 ---
 
