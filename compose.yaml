@@ -1,51 +1,74 @@
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - backend
-    networks:
-      - blog
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgres://user:password@postgres:5432/blogdb
-    depends_on:
-      - postgres
-    networks:
-      - blog
-  postgres:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: blogdb
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - blog
-  redis:
-    image: redis:8-alpine
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6379:6379"
-    networks:
-      - blog
-    
-volumes:
-  postgres_data:
-  redis_data:
+    redis:
+        image: 'redis:8-alpine'
+        volumes:
+            - redis-data:/data
+        networks:
+            - blog
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    postgres:
+        image: 'postgres:17-alpine'
+        env_file:
+            - .env
+        environment:
+            - PGDATA=/var/lib/postgresql/data/pgdata
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        networks:
+            - blog
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U blog -d blog']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    backend:
+        build: ./backend
+        env_file:
+            - .env
+        environment:
+            - POSTGRES_SERVER=postgres
+        ports:
+            - '8000:8000'
+        volumes:
+            - python-dependencies:/app/.venv
+            - ./backend:/app
+        networks:
+            - blog
+        depends_on:
+            - postgres
+            - redis
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    frontend:
+        build: ./frontend
+        ports:
+            - '3000:3000'
+        environment:
+            - NEXT_PUBLIC_API_URL=http://localhost:8000
+        env_file:
+            - .env
+        volumes:
+            - ./frontend:/app
+            - node-modules:/app/node_modules
+        networks:
+            - blog
+        depends_on:
+            - backend
 
 networks:
-  blog:
+    blog:
+
+volumes:
+    postgres-data:
+    redis-data:
+    node-modules:
+    python-dependencies:

@@ -1,7 +1,8 @@
-from sqlmodel import SQLModel, Field
-from uuid import UUID, uuid4
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
+from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
 
 
 class PostBase(SQLModel):
@@ -24,6 +25,6 @@ class PostRead(PostBase):
 
 
 class PostUpdate(SQLModel):
-    title: Optional[str] = None
-    content: Optional[str] = None
-    is_published: Optional[bool] = None
+    title: str | None = None
+    content: str | None = None
+    is_published: bool | None = None

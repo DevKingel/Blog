@@ -1,7 +1,8 @@
-from sqlmodel import SQLModel, Field
-from uuid import UUID, uuid4
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
 
 
 class UserBase(SQLModel):
@@ -20,6 +21,6 @@ class UserRead(UserBase):
 
 
 class UserUpdate(SQLModel):
-    username: Optional[str] = None
-    email: Optional[str] = None
-    hashed_password: Optional[str] = None
+    username: str | None = None
+    email: str | None = None
+    hashed_password: str | None = None

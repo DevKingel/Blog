@@ -1,6 +1,7 @@
-from sqlmodel import SQLModel, Field
-from uuid import UUID, uuid4
 from typing import Optional
+from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
 
 
 class RoleBase(SQLModel):
@@ -16,4 +17,4 @@ class RoleRead(RoleBase):
 
 
 class RoleUpdate(SQLModel):
-    name: Optional[str] = None
+    name: str | None = None

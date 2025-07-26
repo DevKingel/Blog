@@ -1,6 +1,7 @@
-from sqlmodel import SQLModel, Field
-from uuid import UUID, uuid4
 from typing import Optional
+from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
 
 
 class CategoryBase(SQLModel):
@@ -17,5 +18,5 @@ class CategoryRead(CategoryBase):
 
 
 class CategoryUpdate(SQLModel):
-    name: Optional[str] = None
-    slug: Optional[str] = None
+    name: str | None = None
+    slug: str | None = None

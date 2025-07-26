@@ -1,13 +1,14 @@
-from sqlmodel import SQLModel, Field
-from uuid import UUID, uuid4
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
 
 
 class CommentBase(SQLModel):
     user_id: UUID
     post_id: UUID
-    parent_comment_id: Optional[UUID] = None
+    parent_comment_id: UUID | None = None
     content: str
 
 
@@ -22,4 +23,4 @@ class CommentRead(CommentBase):
 
 
 class CommentUpdate(SQLModel):
-    content: Optional[str] = None
+    content: str | None = None

@@ -1,9 +1,51 @@
 services:
-  adminer:
-    image: adminer:latest
-    depends_on:
-      - postgres
-    environment:
-      - ADMINER_DESIGN=pepa-linha-dark
-    ports:
-      - "8080:8080"
+    backend:
+        restart: 'no'
+        ports:
+            - '8000:8000'
+        build:
+            context: ./backend
+        # command: sleep infinity  # Infinite loop to keep container alive doing nothing
+        command:
+            - uvicorn
+            - --host
+            - 0.0.0.0
+            - app.main:app
+            - --reload
+        develop:
+            watch:
+                - path: ./backend
+                  action: sync
+                  target: /app
+                  ignore:
+                      - ./backend/.venv
+                      - .venv
+                - path: ./backend/pyproject.toml
+                  action: rebuild
+
+    # python-tools:
+    #     build:
+    #         dockerfile: ../python_tools/Dockerfile
+    #         context: ./backend
+    #     env_file:
+    #         - .env
+    #     environment:
+    #         - POSTGRES_SERVER=postgres
+    #     volumes:
+    #         - ./backend:/app
+    #     command:
+    #         - 'tail'
+    #         - '-f'
+    #         - '/dev/null'
+
+    adminer:
+        image: adminer:latest
+        ports:
+            - '8080:8080'
+        networks:
+            - blog
+
+    frontend:
+        restart: 'no'
+        build:
+            target: dev

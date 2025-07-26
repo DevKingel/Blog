@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker",
+        "asciidoctor.asciidoctor-vscode",
+        "yzhang.markdown-all-in-one",
+        "rooveterinaryinc.roo-cline",
+        "donjayamanne.githistory",
+        "ms-azuretools.vscode-containers",
+        "charliermarsh.ruff"
+    ]
+}

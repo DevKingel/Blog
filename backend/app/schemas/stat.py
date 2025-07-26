@@ -1,6 +1,7 @@
-from sqlmodel import SQLModel, Field
-from uuid import UUID, uuid4
 from typing import Optional
+from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
 
 
 class StatBase(SQLModel):
@@ -18,5 +19,5 @@ class StatsRead(StatBase):
 
 
 class StatUpdate(SQLModel):
-    views: Optional[int] = None
-    likes: Optional[int] = None
+    views: int | None = None
+    likes: int | None = None

@@ -1,5 +1,6 @@
-from sqlmodel import SQLModel, Field
 from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
 
 
 class Tag(SQLModel, table=True):

@@ -26,12 +26,15 @@
     "javascript.preferences.importModuleSpecifier": "non-relative",
     "typescript.tsdk": "node_modules/typescript/lib",
 
-    // Python (if applicable)
-    "python.formatting.provider": "black",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
-    "python.analysis.typeCheckingMode": "basic",
+    // Python
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        },
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
 
     // Prettier
     "prettier.printWidth": 100,

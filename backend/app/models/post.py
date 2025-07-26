@@ -1,10 +1,17 @@
-from sqlmodel import Field, SQLModel, Relationship
-from typing import Optional, List
 from datetime import datetime
+from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from .category import Category
+    from .comment import Comment
+    from .user import User
+
+
 class Post(SQLModel, table=True):
-    id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
+    id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     author_id: UUID = Field(foreign_key="user.id")
     category_id: UUID = Field(foreign_key="category.id")
     slug: str = Field(unique=True, index=True)
@@ -17,4 +24,4 @@ class Post(SQLModel, table=True):
     # Relationships
     author: Optional["User"] = Relationship(back_populates="posts")
     category: Optional["Category"] = Relationship(back_populates="posts")
-    comments: List["Comment"] = Relationship(back_populates="post")
+    comments: list["Comment"] = Relationship(back_populates="post")
