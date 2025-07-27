@@ -50,7 +50,7 @@ exclude = ["alembic"]
 # Allow autofix of certain rules
 fixable = ["ALL"]
 select = ['E', 'F', "B", 'W', 'A', 'PLC', 'PLE', 'PLW', "C4", "UP", 'I']
-unfixable = ["F401"]  # Example: don't auto-remove unused imports if unsure
+unfixable = []  # Example: don't auto-remove unused imports if unsure
 
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.

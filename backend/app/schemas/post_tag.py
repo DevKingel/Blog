@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import SQLModel
 
 
 class PostTagBase(SQLModel):

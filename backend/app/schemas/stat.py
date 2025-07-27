@@ -1,7 +1,6 @@
-from typing import Optional
-from uuid import UUID, uuid4
+from uuid import UUID
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import SQLModel
 
 
 class StatBase(SQLModel):
