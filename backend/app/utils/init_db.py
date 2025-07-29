@@ -2,6 +2,7 @@ import logging
 
 from sqlmodel import Session, SQLModel
 
+from app.db.session import engine
 from app.models.category import Category
 from app.models.comment import Comment
 from app.models.post import Post
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def init_db(session: Session) -> None:
-    SQLModel.metadata.create_all(session)
+    SQLModel.metadata.create_all(session.bind)
 
     # Add initial data
     # Users
