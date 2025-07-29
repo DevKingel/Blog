@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
@@ -22,14 +22,14 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True, max_length=255, nullable=False)
     hashed_password: str = Field(max_length=255, nullable=False)
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(tz=datetime.timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_column=Column(
             DateTime(timezone=True), nullable=False, server_default=text("NOW()")
         ),
     )
 
     # Relationships
-    comments: list["Comment"] = Relationship(back_populates="users")
+    comments: list["Comment"] = Relationship(back_populates="user")
     roles: list["Role"] = Relationship(back_populates="users", link_model=UserRole)
     posts: list["Post"] = Relationship(back_populates="author")
 
