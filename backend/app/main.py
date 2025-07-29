@@ -1,3 +1,8 @@
 from fastapi import FastAPI
 
-app = FastAPI(title="E-commercre B2B")
+app = FastAPI()
+
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
