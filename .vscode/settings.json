@@ -78,5 +78,6 @@
             "comments": "off",
             "strings": "off"
         }
-    }
+    },
+    "workbench.editor.enablePreview": true
 }
