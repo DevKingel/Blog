@@ -1,9 +1,15 @@
 from uuid import UUID
-from backend.app.models.user import User
+
 from fastapi import HTTPException
+from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+
+from app.models.user import User
+
+# Setup password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def create_user(db: AsyncSession, user_data: dict) -> User:
@@ -51,20 +57,13 @@ async def get_user_by_id(db: AsyncSession, user_id: UUID) -> User | None:
     return user
 
 
-async def get_all_users(db: AsyncSession) -> list[User]:
+async def get_multi_user(
+    db: AsyncSession, *, skip: int = 0, limit: int = 100
+) -> list[User]:
     """
-    Retrieves all users.
-
-    Args:
-        db (AsyncSession): Database session.
-
-    Returns:
-        List[User]: A list of all user objects.
+    Get multiple users with pagination.
     """
-    query = select(User).options(
-        selectinload(User.comments), selectinload(User.roles), selectinload(User.posts)
-    )
-    result = await db.execute(query)
+    result = await db.execute(select(User).offset(skip).limit(limit))
     return result.scalars().all()
 
 
@@ -107,3 +106,11 @@ async def delete_user(db: AsyncSession, user_id: UUID) -> bool:
     await db.delete(user)
     await db.commit()
     return True
+
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)

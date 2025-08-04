@@ -1,8 +1,9 @@
-from backend.app.db.session import engine
-from backend.app.models.comment import Comment
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from sqlmodel import Session, delete, update
+
+from app.db.session import engine
+from app.models.comment import Comment
 
 
 async def create_comment(comment: Comment) -> Comment:

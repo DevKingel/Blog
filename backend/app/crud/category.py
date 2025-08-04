@@ -1,20 +1,29 @@
-from backend.app.models.category import Category
 from fastapi import HTTPException
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.category import Category
 
 
-async def create_category(db: Session, category: Category) -> Category:
+async def create_category(db: AsyncSession, category_data: dict) -> Category:
     """
     Create a new category in the database.
+
+    Args:
+        db (Session): Database session.
+        category_data (dict): Data for the new category.
+
+    Returns:
+        Category: The created category object.
     """
+    category = Category(**category_data)
     db.add(category)
     await db.commit()
     await db.refresh(category)
     return category
 
 
-async def get_category_by_id(db: Session, category_id: str) -> Category | None:
+async def get_category_by_id(db: AsyncSession, category_id: str) -> Category | None:
     """
     Get a category by its ID from the database.
     """
@@ -23,32 +32,50 @@ async def get_category_by_id(db: Session, category_id: str) -> Category | None:
     return result.scalar_one_or_none()
 
 
-async def get_all_categories(db: Session) -> list[Category]:
+async def get_all_categories(
+    db: AsyncSession, *, skip: int = 0, limit: int = 100
+) -> list[Category]:
     """
-    Get all categories from the database.
+    Get all categories with pagination.
+
+    Args:
+        db (AsyncSession): Database session.
+        skip (int): Number of records to skip.
+        limit (int): Maximum number of records to return.
+
+    Returns:
+        list[Category]: List of category objects.
     """
-    query = select(Category)
-    result = await db.execute(query)
+    result = await db.execute(select(Category).offset(skip).limit(limit))
     return result.scalars().all()
 
 
 async def update_category(
-    db: Session, category_id: str, updated_category: Category
+    db: AsyncSession, category_id: str, category_data: dict
 ) -> Category | None:
     """
     Update a category in the database.
+
+    Args:
+        db (AsyncSession): Database session.
+        category_id (str): ID of the category to update.
+        category_data (dict): Data to update the category with.
+
+    Returns:
+        Optional[Category]: The updated category object if found, None otherwise.
     """
     category = await get_category_by_id(db, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    for var, value in vars(updated_category).items():
-        setattr(category, var, value) if value else None
+        return None
+    for key, value in category_data.items():
+        if value:
+            setattr(category, key, value)
     await db.commit()
     await db.refresh(category)
     return category
 
 
-async def delete_category(db: Session, category_id: str) -> bool:
+async def delete_category(db: AsyncSession, category_id: str) -> bool:
     """
     Delete a category from the database.
     """
