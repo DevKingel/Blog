@@ -10,6 +10,7 @@ from .user_role import UserRole
 
 if TYPE_CHECKING:
     from .comment import Comment
+    from .media import Media
     from .post import Post
     from .role import Role
 
@@ -30,6 +31,7 @@ class User(SQLModel, table=True):
 
     # Relationships
     comments: list["Comment"] = Relationship(back_populates="user")
+    media: list["Media"] = Relationship(back_populates="user")
     roles: list["Role"] = Relationship(back_populates="users", link_model=UserRole)
     posts: list["Post"] = Relationship(back_populates="author")
 
