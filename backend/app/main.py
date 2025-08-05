@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     media,
     posts,
     profile,
+    roles,
     search,
     stats,
     tags,
@@ -68,6 +69,7 @@ app.include_router(
 
 app.include_router(media.router, prefix=f"{settings.API_V1_STR}/media", tags=["media"])
 app.include_router(admin.router, prefix=f"{settings.API_V1_STR}/admin", tags=["admin"])
+app.include_router(roles.router, prefix=f"{settings.API_V1_STR}/roles", tags=["roles"])
 
 
 @app.get("/")
