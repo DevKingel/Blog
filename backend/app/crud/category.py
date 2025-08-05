@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, or_
 
 from app.models.category import Category
 
@@ -81,7 +82,29 @@ async def delete_category(db: AsyncSession, category_id: str) -> bool:
     """
     category = await get_category_by_id(db, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+        return False
     await db.delete(category)
     await db.commit()
     return True
+
+
+async def search_categories(
+    db: AsyncSession, *, query: str, skip: int = 0, limit: int = 100
+) -> tuple[list[Category], int]:
+    """
+    Search categories by query string (name).
+    """
+    # Create the search query
+    search_query = select(Category).where(Category.name.ilike(f"%{query}%"))
+    
+    # Get total count
+    count_query = select(func.count()).select_from(search_query.subquery())
+    total_result = await db.execute(count_query)
+    total = total_result.scalar_one()
+    
+    # Apply pagination
+    paginated_query = search_query.offset(skip).limit(limit)
+    result = await db.execute(paginated_query)
+    categories = result.scalars().all()
+    
+    return categories, total

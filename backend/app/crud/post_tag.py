@@ -1,9 +1,11 @@
 from uuid import UUID
-from backend.app.db.session import db_session
-from backend.app.models.post_tag import PostTag
+
 from fastapi import HTTPException
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+
+from app.db.session import engine
+from app.models.post_tag import PostTag
 
 
 async def create_post_tag(post_id: UUID, tag_id: UUID) -> PostTag:
@@ -11,9 +13,9 @@ async def create_post_tag(post_id: UUID, tag_id: UUID) -> PostTag:
     Create a new post-tag relationship.
     """
     post_tag = PostTag(post_id=post_id, tag_id=tag_id)
-    db_session.add(post_tag)
-    await db_session.commit()
-    await db_session.refresh(post_tag)
+    engine.add(post_tag)
+    await engine.commit()
+    await engine.refresh(post_tag)
     return post_tag
 
 
@@ -26,7 +28,7 @@ async def get_post_tag_by_ids(post_id: UUID, tag_id: UUID) -> PostTag | None:
         .where(PostTag.post_id == post_id, PostTag.tag_id == tag_id)
         .options(selectinload(PostTag.post), selectinload(PostTag.tag))
     )
-    result = await db_session.execute(query)
+    result = await engine.execute(query)
     return result.scalars().first()
 
 
@@ -37,7 +39,7 @@ async def get_all_post_tags() -> list[PostTag]:
     query = select(PostTag).options(
         selectinload(PostTag.post), selectinload(PostTag.tag)
     )
-    result = await db_session.execute(query)
+    result = await engine.execute(query)
     return result.scalars().all()
 
 
@@ -52,8 +54,8 @@ async def update_post_tag(
         raise HTTPException(status_code=404, detail="PostTag not found")
     post_tag.post_id = new_post_id
     post_tag.tag_id = new_tag_id
-    await db_session.commit()
-    await db_session.refresh(post_tag)
+    await engine.commit()
+    await engine.refresh(post_tag)
     return post_tag
 
 
@@ -64,6 +66,6 @@ async def delete_post_tag(post_id: UUID, tag_id: UUID) -> bool:
     post_tag = await get_post_tag_by_ids(post_id, tag_id)
     if not post_tag:
         raise HTTPException(status_code=404, detail="PostTag not found")
-    await db_session.delete(post_tag)
-    await db_session.commit()
+    await engine.delete(post_tag)
+    await engine.commit()
     return True
