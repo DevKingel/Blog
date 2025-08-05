@@ -20,3 +20,23 @@ class StatsRead(StatBase):
 class StatUpdate(SQLModel):
     views: int | None = None
     likes: int | None = None
+
+
+class PostStatsRead(SQLModel):
+    post_id: UUID
+    views: int
+    likes: int
+
+
+class UserStatsRead(SQLModel):
+    user_id: UUID
+    total_posts: int
+    total_views: int
+    total_likes: int
+
+
+class SiteStatsRead(SQLModel):
+    total_posts: int
+    total_users: int
+    total_views: int
+    total_likes: int
