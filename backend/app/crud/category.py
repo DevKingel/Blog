@@ -1,7 +1,6 @@
-from fastapi import HTTPException
-from sqlalchemy.future import select
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import func, or_
+from sqlalchemy.future import select
 
 from app.models.category import Category
 
@@ -96,15 +95,15 @@ async def search_categories(
     """
     # Create the search query
     search_query = select(Category).where(Category.name.ilike(f"%{query}%"))
-    
+
     # Get total count
     count_query = select(func.count()).select_from(search_query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Apply pagination
     paginated_query = search_query.offset(skip).limit(limit)
     result = await db.execute(paginated_query)
     categories = result.scalars().all()
-    
+
     return categories, total

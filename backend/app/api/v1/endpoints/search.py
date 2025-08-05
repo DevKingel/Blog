@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import user as user_crud
-from app.crud import post as post_crud
 from app.crud import category as category_crud
+from app.crud import post as post_crud
 from app.crud import tag as tag_crud
+from app.crud import user as user_crud
 from app.db.session import get_session
 from app.schemas.search import (
-    PostSearchResult,
-    UserSearchResult,
     CategorySearchResult,
+    PostSearchResult,
     TagSearchResult,
+    UserSearchResult,
 )
 
 router = APIRouter()

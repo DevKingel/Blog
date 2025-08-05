@@ -38,7 +38,7 @@ async def create_comment_for_post(
         await get_post_by_id(db, post_id)
     except HTTPException:
         raise HTTPException(status_code=404, detail="Post not found")
-    
+
     # Create the comment
     comment = Comment(
         user_id=comment_in.user_id,
@@ -76,7 +76,7 @@ async def update_comment_by_id(
     db_comment = await comment_crud.get_comment_by_id(db, comment_id=comment_id)
     if not db_comment:
         raise HTTPException(status_code=404, detail="Comment not found")
-    
+
     # Update the comment with the new data
     update_data = comment_in.dict(exclude_unset=True)
     updated_comment = await comment_crud.update_comment(db, comment_id=comment_id, comment_data=update_data)
@@ -96,7 +96,7 @@ async def delete_comment_by_id(
     comment = await comment_crud.get_comment_by_id(db, comment_id=comment_id)
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
-    
+
     success = await comment_crud.delete_comment(db, comment_id=comment_id)
     if not success:
         raise HTTPException(status_code=404, detail="Comment not found")
@@ -116,7 +116,7 @@ async def reply_to_comment(
     parent_comment = await comment_crud.get_comment_by_id(db, comment_id=comment_id)
     if not parent_comment:
         raise HTTPException(status_code=404, detail="Parent comment not found")
-    
+
     # Create the reply comment
     # The post_id should be the same as the parent comment's post_id
     comment = Comment(
@@ -141,6 +141,6 @@ async def read_replies_to_comment(
     parent_comment = await comment_crud.get_comment_by_id(db, comment_id=comment_id)
     if not parent_comment:
         raise HTTPException(status_code=404, detail="Parent comment not found")
-    
+
     replies = await comment_crud.get_replies_by_comment(db, comment_id=comment_id)
     return replies

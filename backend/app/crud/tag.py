@@ -1,10 +1,10 @@
 from uuid import UUID
 
 from fastapi import HTTPException
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy import func, or_
 
 from app.models.tag import Tag
 
@@ -54,17 +54,17 @@ async def search_tags(
         .where(Tag.name.ilike(f"%{query}%"))
         .options(selectinload(Tag.posts))
     )
-    
+
     # Get total count
     count_query = select(func.count()).select_from(search_query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Apply pagination
     paginated_query = search_query.offset(skip).limit(limit)
     result = await db.execute(paginated_query)
     tags = result.scalars().all()
-    
+
     return tags, total
 
 

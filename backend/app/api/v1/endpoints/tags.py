@@ -29,7 +29,7 @@ async def create_new_tag(
             status_code=400,
             detail="A tag with this name or slug already exists.",
         )
-    
+
     # Create the tag
     tag = Tag(**tag_in.dict())
     tag = await tag_crud.create_tag(db, tag=tag)
@@ -80,12 +80,12 @@ async def update_existing_tag(
             status_code=404,
             detail="The tag with this id does not exist in the system",
         )
-    
+
     # Check if another tag with the same name or slug already exists
     if tag_in.name or tag_in.slug:
         existing_tag = await tag_crud.get_tag_by_name_or_slug(
-            db, 
-            name=tag_in.name or db_tag.name, 
+            db,
+            name=tag_in.name or db_tag.name,
             slug=tag_in.slug or db_tag.slug
         )
         if existing_tag and existing_tag.id != tag_id:
@@ -93,7 +93,7 @@ async def update_existing_tag(
                 status_code=400,
                 detail="A tag with this name or slug already exists.",
             )
-    
+
     # Update the tag
     tag_data = tag_in.dict(exclude_unset=True)
     tag = await tag_crud.update_tag(db, tag_id=tag_id, tag_update=tag_data)
@@ -127,7 +127,7 @@ async def get_posts_with_tag(
     tag = await tag_crud.get_tag_by_id(db, tag_id=tag_id)
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")
-    
+
     # Get posts with this tag
     posts = await get_posts_by_tag(db, tag_id=tag_id)
     return posts

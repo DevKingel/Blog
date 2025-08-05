@@ -42,15 +42,15 @@ async def update_existing_post(
             status_code=404,
             detail="The post with this id does not exist in the system",
         )
-    
+
     # Update the post with the new data
     update_data = post_in.dict(exclude_unset=True)
     for key, value in update_data.items():
         setattr(db_post, key, value)
-    
+
     # Update the updated_at timestamp
     db_post.updated_at = datetime.utcnow()
-    
+
     db.add(db_post)
     await db.commit()
     await db.refresh(db_post)
@@ -69,7 +69,7 @@ async def delete_post_by_id(
     post = await post_crud.get_post_by_id(db, post_id)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    
+
     await db.delete(post)
     await db.commit()
     return None
@@ -86,7 +86,7 @@ async def read_draft_posts(
     # Query for posts where is_published is False
     from sqlalchemy.future import select
     from sqlalchemy.orm import selectinload
-    
+
     query = select(Post).where(Post.is_published == False).options(
         selectinload(Post.author),
         selectinload(Post.category),
@@ -110,7 +110,7 @@ async def read_published_posts(
     # Query for posts where is_published is True
     from sqlalchemy.future import select
     from sqlalchemy.orm import selectinload
-    
+
     query = select(Post).where(Post.is_published == True).options(
         selectinload(Post.author),
         selectinload(Post.category),
@@ -138,18 +138,18 @@ async def publish_post(
             status_code=404,
             detail="The post with this id does not exist in the system",
         )
-    
+
     if db_post.is_published:
         raise HTTPException(
             status_code=400,
             detail="The post is already published",
         )
-    
+
     # Update the post to published
     db_post.is_published = True
     db_post.published_at = datetime.utcnow()
     db_post.updated_at = datetime.utcnow()
-    
+
     db.add(db_post)
     await db.commit()
     await db.refresh(db_post)
@@ -171,17 +171,17 @@ async def unpublish_post(
             status_code=404,
             detail="The post with this id does not exist in the system",
         )
-    
+
     if not db_post.is_published:
         raise HTTPException(
             status_code=400,
             detail="The post is not published",
         )
-    
+
     # Update the post to unpublished
     db_post.is_published = False
     db_post.updated_at = datetime.utcnow()
-    
+
     db.add(db_post)
     await db.commit()
     await db.refresh(db_post)

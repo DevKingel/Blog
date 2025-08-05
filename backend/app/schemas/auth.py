@@ -1,6 +1,3 @@
-from datetime import datetime
-from typing import Optional
-from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
 
@@ -11,7 +8,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    email: Optional[str] = None
+    email: str | None = None
 
 
 class LoginRequest(BaseModel):

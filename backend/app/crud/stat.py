@@ -1,12 +1,12 @@
 from uuid import UUID
 
 from fastapi.exceptions import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.stat import Stat
 from app.models.post import Post
+from app.models.stat import Stat
 from app.models.user import User
 
 
@@ -240,16 +240,16 @@ async def get_user_stats(db: AsyncSession, user_id: UUID) -> dict:
     posts_query = select(Post).where(Post.author_id == user_id)
     posts_result = await db.execute(posts_query)
     user_posts = posts_result.scalars().all()
-    
+
     # Get stats for user's posts
     post_ids = [post.id for post in user_posts]
     stats_query = select(Stat).where(Stat.post_id.in_(post_ids))
     stats_result = await db.execute(stats_query)
     stats = stats_result.scalars().all()
-    
+
     total_views = sum(stat.views for stat in stats)
     total_likes = sum(stat.likes for stat in stats)
-    
+
     return {
         "user_id": user_id,
         "total_posts": len(user_posts),

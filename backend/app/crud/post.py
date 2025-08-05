@@ -2,10 +2,10 @@ import uuid
 from uuid import UUID
 
 from fastapi import HTTPException
+from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy import func, or_
 
 from app.models.post import Post
 from app.models.post_tag import PostTag
@@ -127,17 +127,17 @@ async def search_posts(
             selectinload(Post.stat),
         )
     )
-    
+
     # Get total count
     count_query = select(func.count()).select_from(search_query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Apply pagination
     paginated_query = search_query.offset(skip).limit(limit)
     result = await db.execute(paginated_query)
     posts = result.scalars().all()
-    
+
     return posts, total
 
 

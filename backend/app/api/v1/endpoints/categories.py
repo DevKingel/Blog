@@ -42,7 +42,7 @@ async def create_new_category(
                 status_code=400,
                 detail="The category with this slug already exists in the system.",
             )
-    
+
     category_data = category_in.dict()
     category = await category_crud.create_category(db, category_data=category_data)
     return category
@@ -114,7 +114,7 @@ async def update_existing_category(
             status_code=400,
             detail="No data provided for update",
         )
-    
+
     # Check if category exists
     existing_category = await category_crud.get_category_by_id(db, category_id=str(category_id))
     if not existing_category:
@@ -122,7 +122,7 @@ async def update_existing_category(
             status_code=404,
             detail="The category with this id does not exist in the system",
         )
-    
+
     # Check if updated name or slug conflicts with existing categories
     if category_data.get("name") or category_data.get("slug"):
         all_categories = await category_crud.get_all_categories(db)
@@ -140,7 +140,7 @@ async def update_existing_category(
                     status_code=400,
                     detail="The category with this slug already exists in the system.",
                 )
-    
+
     category = await category_crud.update_category(
         db, category_id=str(category_id), category_data=category_data
     )
@@ -194,6 +194,6 @@ async def get_category_posts(
     category = await category_crud.get_category_by_id(db, category_id=str(category_id))
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    
+
     posts = await get_posts_by_category(db, category_id=category_id)
     return posts

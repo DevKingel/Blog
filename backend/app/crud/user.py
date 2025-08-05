@@ -2,10 +2,10 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from passlib.context import CryptContext
+from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy import func, or_
 
 from app.models.user import User
 
@@ -163,15 +163,15 @@ async def search_users(
             selectinload(User.posts),
         )
     )
-    
+
     # Get total count
     count_query = select(func.count()).select_from(search_query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Apply pagination
     paginated_query = search_query.offset(skip).limit(limit)
     result = await db.execute(paginated_query)
     users = result.scalars().all()
-    
+
     return users, total

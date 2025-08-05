@@ -1,20 +1,18 @@
 import uuid
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.admin import get_admin_user
-from app.crud import user as user_crud
 from app.crud import post as post_crud
 from app.crud import stat as stat_crud
+from app.crud import user as user_crud
 from app.db.session import get_session
-from app.models.user import User
 from app.models.post import Post
-from app.schemas.admin import AdminStatsRead, UserListRead, PostListRead
-from app.schemas.user import UserRead
+from app.models.user import User
+from app.schemas.admin import AdminStatsRead, PostListRead, UserListRead
 from app.schemas.post import PostRead
-
+from app.schemas.user import UserRead
 
 router = APIRouter()
 
@@ -59,7 +57,7 @@ async def list_all_users(
     """
     users = await user_crud.get_multi_user(db, skip=skip, limit=limit)
     total_users = len(users)
-    
+
     return UserListRead(
         users=[UserRead(**user.__dict__) for user in users],
         total=total_users,
@@ -89,19 +87,19 @@ async def delete_any_user(
     user = await user_crud.get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     # Prevent admin from deleting themselves
     if user.id == current_admin.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You cannot delete yourself"
         )
-    
+
     # Delete the user
     success = await user_crud.delete_user(db, user_id=user_id)
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     return None
 
 
@@ -127,7 +125,7 @@ async def list_all_posts(
     # Get all posts with pagination
     from sqlalchemy.future import select
     from sqlalchemy.orm import selectinload
-    
+
     query = select(Post).options(
         selectinload(Post.author),
         selectinload(Post.category),
@@ -135,11 +133,11 @@ async def list_all_posts(
         selectinload(Post.tags),
         selectinload(Post.stat),
     ).offset(skip).limit(limit)
-    
+
     result = await db.execute(query)
     posts = result.scalars().all()
     total_posts = len(posts)
-    
+
     return PostListRead(
         posts=[PostRead(**post.__dict__) for post in posts],
         total=total_posts,
@@ -169,10 +167,10 @@ async def delete_any_post(
     post = await post_crud.get_post_by_id(db, post_id)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    
+
     # Delete the post
     success = await post_crud.delete_post(db, post_id=post_id)
     if not success:
         raise HTTPException(status_code=404, detail="Post not found")
-    
+
     return None

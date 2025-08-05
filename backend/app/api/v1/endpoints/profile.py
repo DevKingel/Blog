@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.user import get_user_by_id, update_user
 from app.db.session import get_session
 from app.schemas.profile import ProfileRead, ProfileUpdate
-from app.schemas.user import UserRead
 
 router = APIRouter()
 
@@ -39,7 +39,7 @@ async def update_current_user_profile(
     user = await get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     # Filter out None values
     update_data = profile_update.dict(exclude_unset=True)
     updated_user = await update_user(db, user_id, update_data)

@@ -1,9 +1,9 @@
 from sqlmodel import SQLModel
 
-from .post import PostRead
-from .user import UserRead
 from .category import CategoryRead
+from .post import PostRead
 from .tag import TagRead
+from .user import UserRead
 
 
 class PostSearchResult(SQLModel):

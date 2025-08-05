@@ -1,11 +1,9 @@
 import uuid
 
-from fastapi import HTTPException
+from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy import delete, update
-from sqlmodel import select as sqlmodel_select
 
 from app.models.comment import Comment
 

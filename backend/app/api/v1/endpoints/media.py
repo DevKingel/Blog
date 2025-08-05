@@ -1,16 +1,14 @@
 import os
 import uuid
 from pathlib import Path
-from typing import List
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
 from app.crud import media as media_crud
 from app.db.session import get_session
 from app.models.media import Media
-from app.schemas.media import MediaCreate, MediaRead, MediaUpdate
+from app.schemas.media import MediaCreate, MediaRead
 
 # Create the media directory if it doesn't exist
 MEDIA_DIR = Path(__file__).parent.parent.parent.parent / "media"
@@ -60,7 +58,7 @@ async def upload_media(
     file.file.seek(0, os.SEEK_END)
     file_size = file.file.tell()
     file.file.seek(0)
-    
+
     if file_size > MAX_FILE_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
@@ -86,21 +84,21 @@ async def upload_media(
         file_size=file_size,
         file_path=relative_path,
     )
-    
+
     # For now, we'll use a placeholder user_id
     # In a real implementation, this would come from the authenticated user
     user_id = uuid.uuid4()  # Placeholder
-    
+
     media = await media_crud.create_media(db, media_in, user_id)
     return media
 
 
-@router.get("/", response_model=List[MediaRead])
+@router.get("/", response_model=list[MediaRead])
 async def list_media(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_session),
-) -> List[Media]:
+) -> list[Media]:
     """
     List all uploaded media with pagination.
 
@@ -134,7 +132,7 @@ async def delete_media(
     """
     # Get the media entry to get the file path
     media = await media_crud.get_media_by_id(db, media_id)
-    
+
     # Delete the file from storage
     try:
         # Construct full path from backend/app directory
@@ -144,7 +142,7 @@ async def delete_media(
     except Exception as e:
         # Log the error but continue with database deletion
         print(f"Error deleting file {media.file_path}: {e}")
-    
+
     # Delete the media entry from database
     await media_crud.delete_media(db, media_id)
     return None

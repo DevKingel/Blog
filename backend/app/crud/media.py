@@ -2,10 +2,10 @@ import uuid
 from uuid import UUID
 
 from fastapi import HTTPException
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy import func
 
 from app.models.media import Media
 from app.schemas.media import MediaCreate, MediaUpdate
@@ -69,17 +69,17 @@ async def get_all_media(
     """
     # Create the query for media entries
     query = select(Media).options(selectinload(Media.user))
-    
+
     # Get total count
     count_query = select(func.count()).select_from(query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Apply pagination
     paginated_query = query.offset(skip).limit(limit)
     result = await db.execute(paginated_query)
     media = result.scalars().all()
-    
+
     return media, total
 
 
@@ -104,17 +104,17 @@ async def get_media_by_user(
         .where(Media.user_id == user_id)
         .options(selectinload(Media.user))
     )
-    
+
     # Get total count
     count_query = select(func.count()).select_from(query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Apply pagination
     paginated_query = query.offset(skip).limit(limit)
     result = await db.execute(paginated_query)
     media = result.scalars().all()
-    
+
     return media, total
 
 
