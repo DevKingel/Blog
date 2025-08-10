@@ -41,7 +41,9 @@ async def db_session() -> Generator[AsyncSession]:
 async def test_user(db_session: AsyncSession) -> User:
     """Create a test user."""
     # Check if test user already exists
-    result = await db_session.execute(select(User).where(User.username == "test_comment_user"))
+    result = await db_session.execute(
+        select(User).where(User.username == "test_comment_user")
+    )
     test_user = result.scalar_one_or_none()
 
     if not test_user:
@@ -65,7 +67,9 @@ async def test_user(db_session: AsyncSession) -> User:
 async def test_category(db_session: AsyncSession) -> Category:
     """Create a test category."""
     # Check if test category already exists
-    result = await db_session.execute(select(Category).where(Category.name == "Test Category"))
+    result = await db_session.execute(
+        select(Category).where(Category.name == "Test Category")
+    )
     test_category = result.scalar_one_or_none()
 
     if not test_category:
@@ -83,10 +87,14 @@ async def test_category(db_session: AsyncSession) -> Category:
 
 
 @pytest.fixture
-async def test_post(db_session: AsyncSession, test_user: User, test_category: Category) -> Post:
+async def test_post(
+    db_session: AsyncSession, test_user: User, test_category: Category
+) -> Post:
     """Create a test post."""
     # Check if test post already exists
-    result = await db_session.execute(select(Post).where(Post.title == "Test Post for Comments"))
+    result = await db_session.execute(
+        select(Post).where(Post.title == "Test Post for Comments")
+    )
     test_post = result.scalar_one_or_none()
 
     if not test_post:
@@ -106,12 +114,16 @@ async def test_post(db_session: AsyncSession, test_user: User, test_category: Ca
 
 
 @pytest.fixture
-async def test_comments(db_session: AsyncSession, test_post: Post, test_user: User) -> list[Comment]:
+async def test_comments(
+    db_session: AsyncSession, test_post: Post, test_user: User
+) -> list[Comment]:
     """Create multiple test comments."""
     comments = []
     for i in range(3):
         # Check if comment already exists
-        result = await db_session.execute(select(Comment).where(Comment.content == f"Test Comment {i}"))
+        result = await db_session.execute(
+            select(Comment).where(Comment.content == f"Test Comment {i}")
+        )
         comment = result.scalar_one_or_none()
 
         if not comment:
@@ -131,7 +143,9 @@ async def test_comments(db_session: AsyncSession, test_post: Post, test_user: Us
             await db_session.refresh(comment)
 
     # Get all test comments
-    result = await db_session.execute(select(Comment).where(Comment.content.like("Test Comment %")))
+    result = await db_session.execute(
+        select(Comment).where(Comment.content.like("Test Comment %"))
+    )
     return list(result.scalars().all())
 
 
@@ -182,12 +196,11 @@ def test_create_comment_for_post_success(test_post: Post, test_user: User):
     headers = {"Authorization": f"Bearer {token}"}
 
     # Test data
-    comment_data = {
-        "user_id": str(test_user.id),
-        "content": "This is a test comment"
-    }
+    comment_data = {"user_id": str(test_user.id), "content": "This is a test comment"}
 
-    response = client.post(f"/api/v1/posts/{test_post.id}/comments", json=comment_data, headers=headers)
+    response = client.post(
+        f"/api/v1/posts/{test_post.id}/comments", json=comment_data, headers=headers
+    )
     assert response.status_code == 201
 
     # Verify response structure
@@ -205,13 +218,12 @@ def test_create_comment_for_post_invalid_post(test_user: User):
     headers = {"Authorization": f"Bearer {token}"}
 
     # Test data
-    comment_data = {
-        "user_id": str(test_user.id),
-        "content": "This is a test comment"
-    }
+    comment_data = {"user_id": str(test_user.id), "content": "This is a test comment"}
 
     fake_post_id = uuid.uuid4()
-    response = client.post(f"/api/v1/posts/{fake_post_id}/comments", json=comment_data, headers=headers)
+    response = client.post(
+        f"/api/v1/posts/{fake_post_id}/comments", json=comment_data, headers=headers
+    )
     assert response.status_code == 404
 
 
@@ -227,7 +239,9 @@ def test_create_comment_for_post_missing_fields(test_post: Post, test_user: User
         # Missing content
     }
 
-    response = client.post(f"/api/v1/posts/{test_post.id}/comments", json=comment_data, headers=headers)
+    response = client.post(
+        f"/api/v1/posts/{test_post.id}/comments", json=comment_data, headers=headers
+    )
     assert response.status_code == 422
 
 
@@ -273,11 +287,11 @@ def test_update_comment_by_id_success(test_comments: list[Comment], test_user: U
     headers = {"Authorization": f"Bearer {token}"}
 
     comment = test_comments[0]
-    update_data = {
-        "content": "Updated comment content"
-    }
+    update_data = {"content": "Updated comment content"}
 
-    response = client.put(f"/api/v1/comments/{comment.id}", json=update_data, headers=headers)
+    response = client.put(
+        f"/api/v1/comments/{comment.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 200
 
     # Verify response structure
@@ -293,15 +307,17 @@ def test_update_comment_by_id_not_found(test_user: User):
     headers = {"Authorization": f"Bearer {token}"}
 
     fake_comment_id = uuid.uuid4()
-    update_data = {
-        "content": "Updated comment content"
-    }
+    update_data = {"content": "Updated comment content"}
 
-    response = client.put(f"/api/v1/comments/{fake_comment_id}", json=update_data, headers=headers)
+    response = client.put(
+        f"/api/v1/comments/{fake_comment_id}", json=update_data, headers=headers
+    )
     assert response.status_code == 404
 
 
-def test_update_comment_by_id_invalid_data(test_comments: list[Comment], test_user: User):
+def test_update_comment_by_id_invalid_data(
+    test_comments: list[Comment], test_user: User
+):
     """Test update of a comment with invalid data."""
     if not test_comments:
         pytest.skip("No test comments available")
@@ -315,7 +331,9 @@ def test_update_comment_by_id_invalid_data(test_comments: list[Comment], test_us
         "content": ""  # Empty content
     }
 
-    response = client.put(f"/api/v1/comments/{comment.id}", json=update_data, headers=headers)
+    response = client.put(
+        f"/api/v1/comments/{comment.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 422
 
 
@@ -358,10 +376,12 @@ def test_reply_to_comment_success(test_comments: list[Comment], test_user: User)
     parent_comment = test_comments[0]
     reply_data = {
         "user_id": str(test_user.id),
-        "content": "This is a reply to the comment"
+        "content": "This is a reply to the comment",
     }
 
-    response = client.post(f"/api/v1/comments/{parent_comment.id}/reply", json=reply_data, headers=headers)
+    response = client.post(
+        f"/api/v1/comments/{parent_comment.id}/reply", json=reply_data, headers=headers
+    )
     assert response.status_code == 201
 
     # Verify response structure
@@ -381,11 +401,13 @@ def test_reply_to_comment_parent_not_found(test_user: User):
 
     reply_data = {
         "user_id": str(test_user.id),
-        "content": "This is a reply to the comment"
+        "content": "This is a reply to the comment",
     }
 
     fake_comment_id = uuid.uuid4()
-    response = client.post(f"/api/v1/comments/{fake_comment_id}/reply", json=reply_data, headers=headers)
+    response = client.post(
+        f"/api/v1/comments/{fake_comment_id}/reply", json=reply_data, headers=headers
+    )
     assert response.status_code == 404
 
 
@@ -404,7 +426,9 @@ def test_reply_to_comment_missing_fields(test_comments: list[Comment], test_user
         # Missing content
     }
 
-    response = client.post(f"/api/v1/comments/{parent_comment.id}/reply", json=reply_data, headers=headers)
+    response = client.post(
+        f"/api/v1/comments/{parent_comment.id}/reply", json=reply_data, headers=headers
+    )
     assert response.status_code == 422
 
 

@@ -41,7 +41,9 @@ async def test_read_comments_by_post_success():
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comments_by_post") as mock_get_comments:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comments_by_post"
+    ) as mock_get_comments:
         mock_get_comments.return_value = mock_comments
 
         # Call the endpoint
@@ -65,7 +67,9 @@ async def test_read_comments_by_post_empty_result():
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comments_by_post") as mock_get_comments:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comments_by_post"
+    ) as mock_get_comments:
         mock_get_comments.return_value = mock_comments
 
         # Call the endpoint
@@ -86,12 +90,18 @@ async def test_read_comments_by_post_db_error():
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function to raise an exception
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comments_by_post") as mock_get_comments:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comments_by_post"
+    ) as mock_get_comments:
         mock_get_comments.side_effect = Exception("Database error")
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await read_comments_by_post(post_id=post_id, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while fetching comments"
 
 
 @pytest.mark.asyncio
@@ -100,16 +110,10 @@ async def test_create_comment_for_post_success():
     # Mock data
     post_id = uuid.uuid4()
     user_id = uuid.uuid4()
-    comment_data = CommentCreate(
-        user_id=user_id,
-        content="Test comment"
-    )
+    comment_data = CommentCreate(user_id=user_id, content="Test comment")
     mock_post = Mock()  # Mock post object
     mock_comment = Comment(
-        id=uuid.uuid4(),
-        user_id=user_id,
-        post_id=post_id,
-        content="Test comment"
+        id=uuid.uuid4(), user_id=user_id, post_id=post_id, content="Test comment"
     )
 
     # Mock database session
@@ -118,13 +122,17 @@ async def test_create_comment_for_post_success():
     # Mock the post CRUD and comment CRUD functions
     with (
         patch("app.api.v1.endpoints.comments.get_post_by_id") as mock_get_post,
-        patch("app.api.v1.endpoints.comments.comment_crud.create_comment") as mock_create_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.create_comment"
+        ) as mock_create_comment,
     ):
         mock_get_post.return_value = mock_post
         mock_create_comment.return_value = mock_comment
 
         # Call the endpoint
-        result = await create_comment_for_post(post_id=post_id, comment_in=comment_data, db=mock_db)
+        result = await create_comment_for_post(
+            post_id=post_id, comment_in=comment_data, db=mock_db
+        )
 
         # Assertions
         assert result.content == "Test comment"
@@ -140,21 +148,22 @@ async def test_create_comment_for_post_invalid_post():
     # Mock data
     post_id = uuid.uuid4()
     user_id = uuid.uuid4()
-    comment_data = CommentCreate(
-        user_id=user_id,
-        content="Test comment"
-    )
+    comment_data = CommentCreate(user_id=user_id, content="Test comment")
 
     # Mock database session
     mock_db = AsyncMock()
 
     # Mock the post CRUD function to raise HTTPException
     with patch("app.api.v1.endpoints.comments.get_post_by_id") as mock_get_post:
-        mock_get_post.side_effect = HTTPException(status_code=404, detail="Post not found")
+        mock_get_post.side_effect = HTTPException(
+            status_code=404, detail="Post not found"
+        )
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await create_comment_for_post(post_id=post_id, comment_in=comment_data, db=mock_db)
+            await create_comment_for_post(
+                post_id=post_id, comment_in=comment_data, db=mock_db
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404
@@ -164,17 +173,8 @@ async def test_create_comment_for_post_invalid_post():
 @pytest.mark.asyncio
 async def test_create_comment_for_post_missing_fields():
     """Test creation of a comment with missing required fields."""
-    # Mock data
-    post_id = uuid.uuid4()
-    comment_data = CommentCreate(
-        user_id=None,  # Missing user_id
-        content=""  # Empty content
-    )
-
-    # Mock database session
-    mock_db = AsyncMock()
-
-    # This test is more of a placeholder since Pydantic validation happens before the function call
+    # This test is more of a placeholder
+    # since Pydantic validation happens before the function call
     # In a real test, we would test the validation at the API level
     pass
 
@@ -185,10 +185,7 @@ async def test_create_comment_for_post_db_error():
     # Mock data
     post_id = uuid.uuid4()
     user_id = uuid.uuid4()
-    comment_data = CommentCreate(
-        user_id=user_id,
-        content="Test comment"
-    )
+    comment_data = CommentCreate(user_id=user_id, content="Test comment")
     mock_post = Mock()  # Mock post object
 
     # Mock database session
@@ -197,14 +194,22 @@ async def test_create_comment_for_post_db_error():
     # Mock the post CRUD and comment CRUD functions
     with (
         patch("app.api.v1.endpoints.comments.get_post_by_id") as mock_get_post,
-        patch("app.api.v1.endpoints.comments.comment_crud.create_comment") as mock_create_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.create_comment"
+        ) as mock_create_comment,
     ):
         mock_get_post.return_value = mock_post
         mock_create_comment.side_effect = Exception("Database error")
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
-            await create_comment_for_post(post_id=post_id, comment_in=comment_data, db=mock_db)
+        with pytest.raises(HTTPException) as exc_info:
+            await create_comment_for_post(
+                post_id=post_id, comment_in=comment_data, db=mock_db
+            )
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while creating comment"
 
 
 @pytest.mark.asyncio
@@ -216,14 +221,16 @@ async def test_read_comment_by_id_success():
         id=comment_id,
         user_id=uuid.uuid4(),
         post_id=uuid.uuid4(),
-        content="Test comment"
+        content="Test comment",
     )
 
     # Mock database session
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+    ) as mock_get_comment:
         mock_get_comment.return_value = mock_comment
 
         # Call the endpoint
@@ -245,7 +252,9 @@ async def test_read_comment_by_id_not_found():
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function to return None
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+    ) as mock_get_comment:
         mock_get_comment.return_value = None
 
         # Verify that the exception is raised
@@ -260,9 +269,6 @@ async def test_read_comment_by_id_not_found():
 @pytest.mark.asyncio
 async def test_read_comment_by_id_invalid_uuid():
     """Test retrieval of a comment with invalid UUID."""
-    # Mock database session
-    mock_db = AsyncMock()
-
     # Test with invalid UUID - this will be handled by FastAPI validation
     # before reaching the function, so this test is more of a placeholder
     pass
@@ -277,14 +283,14 @@ async def test_update_comment_by_id_success():
         id=comment_id,
         user_id=uuid.uuid4(),
         post_id=uuid.uuid4(),
-        content="Original comment"
+        content="Original comment",
     )
     update_data = CommentUpdate(content="Updated comment")
     updated_comment = Comment(
         id=comment_id,
         user_id=existing_comment.user_id,
         post_id=existing_comment.post_id,
-        content="Updated comment"
+        content="Updated comment",
     )
 
     # Mock database session
@@ -292,19 +298,27 @@ async def test_update_comment_by_id_success():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.update_comment") as mock_update_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.update_comment"
+        ) as mock_update_comment,
     ):
         mock_get_comment.return_value = existing_comment
         mock_update_comment.return_value = updated_comment
 
         # Call the endpoint
-        result = await update_comment_by_id(comment_id=comment_id, comment_in=update_data, db=mock_db)
+        result = await update_comment_by_id(
+            comment_id=comment_id, comment_in=update_data, db=mock_db
+        )
 
         # Assertions
         assert result.content == "Updated comment"
         mock_get_comment.assert_called_once_with(mock_db, comment_id=comment_id)
-        mock_update_comment.assert_called_once_with(mock_db, comment_id=comment_id, comment_data={"content": "Updated comment"})
+        mock_update_comment.assert_called_once_with(
+            mock_db, comment_id=comment_id, comment_data={"content": "Updated comment"}
+        )
 
 
 @pytest.mark.asyncio
@@ -318,12 +332,16 @@ async def test_update_comment_by_id_not_found():
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function to return None
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+    ) as mock_get_comment:
         mock_get_comment.return_value = None
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await update_comment_by_id(comment_id=comment_id, comment_in=update_data, db=mock_db)
+            await update_comment_by_id(
+                comment_id=comment_id, comment_in=update_data, db=mock_db
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404
@@ -333,23 +351,19 @@ async def test_update_comment_by_id_not_found():
 @pytest.mark.asyncio
 async def test_update_comment_by_id_invalid_data():
     """Test update of a comment with invalid data."""
-    # Mock data
-    comment_id = uuid.uuid4()
-    update_data = CommentUpdate(content="")  # Empty content
-
-    # Mock database session
-    mock_db = AsyncMock()
-
     # Mock the comment CRUD function
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+    ) as mock_get_comment:
         mock_get_comment.return_value = Comment(
-            id=comment_id,
+            id=uuid.uuid4(),
             user_id=uuid.uuid4(),
             post_id=uuid.uuid4(),
-            content="Original comment"
+            content="Original comment",
         )
 
-        # This test is more of a placeholder since Pydantic validation happens before the function call
+        # This test is more of a placeholder
+        # since Pydantic validation happens before the function call
         pass
 
 
@@ -362,7 +376,7 @@ async def test_update_comment_by_id_db_error():
         id=comment_id,
         user_id=uuid.uuid4(),
         post_id=uuid.uuid4(),
-        content="Original comment"
+        content="Original comment",
     )
     update_data = CommentUpdate(content="Updated comment")
 
@@ -371,15 +385,21 @@ async def test_update_comment_by_id_db_error():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.update_comment") as mock_update_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.update_comment"
+        ) as mock_update_comment,
     ):
         mock_get_comment.return_value = existing_comment
         mock_update_comment.return_value = None  # Simulate database error
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await update_comment_by_id(comment_id=comment_id, comment_in=update_data, db=mock_db)
+            await update_comment_by_id(
+                comment_id=comment_id, comment_in=update_data, db=mock_db
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404
@@ -395,7 +415,7 @@ async def test_delete_comment_by_id_success():
         id=comment_id,
         user_id=uuid.uuid4(),
         post_id=uuid.uuid4(),
-        content="Test comment"
+        content="Test comment",
     )
 
     # Mock database session
@@ -403,8 +423,12 @@ async def test_delete_comment_by_id_success():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.delete_comment") as mock_delete_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.delete_comment"
+        ) as mock_delete_comment,
     ):
         mock_get_comment.return_value = mock_comment
         mock_delete_comment.return_value = True
@@ -428,7 +452,9 @@ async def test_delete_comment_by_id_not_found():
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function to return None
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+    ) as mock_get_comment:
         mock_get_comment.return_value = None
 
         # Verify that the exception is raised
@@ -449,7 +475,7 @@ async def test_delete_comment_by_id_db_error():
         id=comment_id,
         user_id=uuid.uuid4(),
         post_id=uuid.uuid4(),
-        content="Test comment"
+        content="Test comment",
     )
 
     # Mock database session
@@ -457,8 +483,12 @@ async def test_delete_comment_by_id_db_error():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.delete_comment") as mock_delete_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.delete_comment"
+        ) as mock_delete_comment,
     ):
         mock_get_comment.return_value = mock_comment
         mock_delete_comment.return_value = False  # Simulate database error
@@ -480,21 +510,15 @@ async def test_reply_to_comment_success():
     user_id = uuid.uuid4()
     post_id = uuid.uuid4()
     parent_comment = Comment(
-        id=parent_comment_id,
-        user_id=user_id,
-        post_id=post_id,
-        content="Parent comment"
+        id=parent_comment_id, user_id=user_id, post_id=post_id, content="Parent comment"
     )
-    reply_data = CommentCreate(
-        user_id=user_id,
-        content="Reply comment"
-    )
+    reply_data = CommentCreate(user_id=user_id, content="Reply comment")
     reply_comment = Comment(
         id=uuid.uuid4(),
         user_id=user_id,
         post_id=post_id,
         parent_comment_id=parent_comment_id,
-        content="Reply comment"
+        content="Reply comment",
     )
 
     # Mock database session
@@ -502,14 +526,20 @@ async def test_reply_to_comment_success():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.create_comment") as mock_create_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.create_comment"
+        ) as mock_create_comment,
     ):
         mock_get_comment.return_value = parent_comment
         mock_create_comment.return_value = reply_comment
 
         # Call the endpoint
-        result = await reply_to_comment(comment_id=parent_comment_id, comment_in=reply_data, db=mock_db)
+        result = await reply_to_comment(
+            comment_id=parent_comment_id, comment_in=reply_data, db=mock_db
+        )
 
         # Assertions
         assert result.content == "Reply comment"
@@ -526,21 +556,22 @@ async def test_reply_to_comment_parent_not_found():
     # Mock data
     parent_comment_id = uuid.uuid4()
     user_id = uuid.uuid4()
-    reply_data = CommentCreate(
-        user_id=user_id,
-        content="Reply comment"
-    )
+    reply_data = CommentCreate(user_id=user_id, content="Reply comment")
 
     # Mock database session
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function to return None
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+    ) as mock_get_comment:
         mock_get_comment.return_value = None
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await reply_to_comment(comment_id=parent_comment_id, comment_in=reply_data, db=mock_db)
+            await reply_to_comment(
+                comment_id=parent_comment_id, comment_in=reply_data, db=mock_db
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404
@@ -550,17 +581,8 @@ async def test_reply_to_comment_parent_not_found():
 @pytest.mark.asyncio
 async def test_reply_to_comment_missing_fields():
     """Test reply to a comment with missing required fields."""
-    # Mock data
-    parent_comment_id = uuid.uuid4()
-    reply_data = CommentCreate(
-        user_id=None,  # Missing user_id
-        content=""  # Empty content
-    )
-
-    # Mock database session
-    mock_db = AsyncMock()
-
-    # This test is more of a placeholder since Pydantic validation happens before the function call
+    # This test is more of a placeholder
+    # since Pydantic validation happens before the function call
     pass
 
 
@@ -572,30 +594,36 @@ async def test_reply_to_comment_db_error():
     user_id = uuid.uuid4()
     post_id = uuid.uuid4()
     parent_comment = Comment(
-        id=parent_comment_id,
-        user_id=user_id,
-        post_id=post_id,
-        content="Parent comment"
+        id=parent_comment_id, user_id=user_id, post_id=post_id, content="Parent comment"
     )
-    reply_data = CommentCreate(
-        user_id=user_id,
-        content="Reply comment"
-    )
+    reply_data = CommentCreate(user_id=user_id, content="Reply comment")
 
     # Mock database session
     mock_db = AsyncMock()
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.create_comment") as mock_create_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.create_comment"
+        ) as mock_create_comment,
     ):
         mock_get_comment.return_value = parent_comment
         mock_create_comment.side_effect = Exception("Database error")
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
-            await reply_to_comment(comment_id=parent_comment_id, comment_in=reply_data, db=mock_db)
+        with pytest.raises(HTTPException) as exc_info:
+            await reply_to_comment(
+                comment_id=parent_comment_id, comment_in=reply_data, db=mock_db
+            )
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert (
+            exc_info.value.detail == "Internal server error while replying to comment"
+        )
 
 
 @pytest.mark.asyncio
@@ -608,7 +636,7 @@ async def test_read_replies_to_comment_success():
         id=parent_comment_id,
         user_id=uuid.uuid4(),
         post_id=post_id,
-        content="Parent comment"
+        content="Parent comment",
     )
     mock_replies = [
         Comment(
@@ -632,8 +660,12 @@ async def test_read_replies_to_comment_success():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.get_replies_by_comment") as mock_get_replies,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_replies_by_comment"
+        ) as mock_get_replies,
     ):
         mock_get_comment.return_value = parent_comment
         mock_get_replies.return_value = mock_replies
@@ -661,7 +693,9 @@ async def test_read_replies_to_comment_parent_not_found():
     mock_db = AsyncMock()
 
     # Mock the comment CRUD function to return None
-    with patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment:
+    with patch(
+        "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+    ) as mock_get_comment:
         mock_get_comment.return_value = None
 
         # Verify that the exception is raised
@@ -683,7 +717,7 @@ async def test_read_replies_to_comment_empty_result():
         id=parent_comment_id,
         user_id=uuid.uuid4(),
         post_id=post_id,
-        content="Parent comment"
+        content="Parent comment",
     )
     mock_replies = []
 
@@ -692,8 +726,12 @@ async def test_read_replies_to_comment_empty_result():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.get_replies_by_comment") as mock_get_replies,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_replies_by_comment"
+        ) as mock_get_replies,
     ):
         mock_get_comment.return_value = parent_comment
         mock_get_replies.return_value = mock_replies
@@ -717,7 +755,7 @@ async def test_read_replies_to_comment_db_error():
         id=parent_comment_id,
         user_id=uuid.uuid4(),
         post_id=post_id,
-        content="Parent comment"
+        content="Parent comment",
     )
 
     # Mock database session
@@ -725,12 +763,23 @@ async def test_read_replies_to_comment_db_error():
 
     # Mock the comment CRUD functions
     with (
-        patch("app.api.v1.endpoints.comments.comment_crud.get_comment_by_id") as mock_get_comment,
-        patch("app.api.v1.endpoints.comments.comment_crud.get_replies_by_comment") as mock_get_replies,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_comment_by_id"
+        ) as mock_get_comment,
+        patch(
+            "app.api.v1.endpoints.comments.comment_crud.get_replies_by_comment"
+        ) as mock_get_replies,
     ):
         mock_get_comment.return_value = parent_comment
         mock_get_replies.side_effect = Exception("Database error")
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await read_replies_to_comment(comment_id=parent_comment_id, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert (
+            exc_info.value.detail
+            == "Internal server error while fetching comment replies"
+        )

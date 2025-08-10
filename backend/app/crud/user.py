@@ -1,19 +1,20 @@
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from passlib.context import CryptContext
 from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.db.session import get_session
 from app.models.user import User
 
 # Setup password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-async def create_user(db: AsyncSession, user_data: dict) -> User:
+async def create_user(user_data: dict, db: AsyncSession = Depends(get_session)) -> User:
     """
     Creates a new user in the database.
 
@@ -31,7 +32,9 @@ async def create_user(db: AsyncSession, user_data: dict) -> User:
     return user
 
 
-async def get_user_by_id(db: AsyncSession, user_id: UUID) -> User | None:
+async def get_user_by_id(
+    user_id: UUID, db: AsyncSession = Depends(get_session)
+) -> User | None:
     """
     Retrieves a user by ID.
 
@@ -58,7 +61,9 @@ async def get_user_by_id(db: AsyncSession, user_id: UUID) -> User | None:
     return user
 
 
-async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
+async def get_user_by_email(
+    email: str, db: AsyncSession = Depends(get_session)
+) -> User | None:
     """
     Retrieves a user by email.
 
@@ -84,7 +89,7 @@ async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
 
 
 async def get_multi_user(
-    db: AsyncSession, *, skip: int = 0, limit: int = 100
+    db: AsyncSession = Depends(get_session), *, skip: int = 0, limit: int = 100
 ) -> list[User]:
     """
     Get multiple users with pagination.
@@ -93,7 +98,9 @@ async def get_multi_user(
     return result.scalars().all()
 
 
-async def update_user(db: AsyncSession, user_id: UUID, user_data: dict) -> User | None:
+async def update_user(
+    user_id: UUID, user_data: dict, db: AsyncSession = Depends(get_session)
+) -> User | None:
     """
     Updates a user by ID.
 
@@ -105,7 +112,7 @@ async def update_user(db: AsyncSession, user_id: UUID, user_data: dict) -> User 
     Returns:
         Optional[User]: The updated user object if found, None otherwise.
     """
-    user = await get_user_by_id(db, user_id)
+    user = await get_user_by_id(user_id, db)
     if not user:
         return None
     for key, value in user_data.items():
@@ -115,7 +122,7 @@ async def update_user(db: AsyncSession, user_id: UUID, user_data: dict) -> User 
     return user
 
 
-async def delete_user(db: AsyncSession, user_id: UUID) -> bool:
+async def delete_user(user_id: UUID, db: AsyncSession = Depends(get_session)) -> bool:
     """
     Deletes a user by ID.
 
@@ -126,7 +133,7 @@ async def delete_user(db: AsyncSession, user_id: UUID) -> bool:
     Returns:
         bool: True if the user was deleted, False otherwise.
     """
-    user = await get_user_by_id(db, user_id)
+    user = await get_user_by_id(user_id, db)
     if not user:
         return False
     await db.delete(user)
@@ -143,7 +150,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 async def search_users(
-    db: AsyncSession, *, query: str, skip: int = 0, limit: int = 100
+    *,
+    query: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_session),
 ) -> tuple[list[User], int]:
     """
     Search users by query string (username or email).
@@ -151,12 +162,7 @@ async def search_users(
     # Create the search query
     search_query = (
         select(User)
-        .where(
-            or_(
-                User.username.ilike(f"%{query}%"),
-                User.email.ilike(f"%{query}%")
-            )
-        )
+        .where(or_(User.username.ilike(f"%{query}%"), User.email.ilike(f"%{query}%")))
         .options(
             selectinload(User.comments),
             selectinload(User.roles),

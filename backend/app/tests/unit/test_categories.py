@@ -34,8 +34,12 @@ async def test_create_category_success():
 
     # Mock the category CRUD functions
     with (
-        patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all,
-        patch("app.api.v1.endpoints.categories.category_crud.create_category") as mock_create,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+        ) as mock_get_all,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.create_category"
+        ) as mock_create,
     ):
         mock_get_all.return_value = []  # No existing categories
         mock_create.return_value = mock_category
@@ -65,7 +69,9 @@ async def test_create_category_duplicate_name():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+    ) as mock_get_all:
         mock_get_all.return_value = [existing_category]
 
         # Verify that the exception is raised
@@ -74,7 +80,10 @@ async def test_create_category_duplicate_name():
 
         # Assertions
         assert exc_info.value.status_code == 400
-        assert exc_info.value.detail == "The category with this name already exists in the system."
+        assert (
+            exc_info.value.detail
+            == "The category with this name already exists in the system."
+        )
 
 
 @pytest.mark.asyncio
@@ -92,7 +101,9 @@ async def test_create_category_duplicate_slug():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+    ) as mock_get_all:
         mock_get_all.return_value = [existing_category]
 
         # Verify that the exception is raised
@@ -101,24 +112,23 @@ async def test_create_category_duplicate_slug():
 
         # Assertions
         assert exc_info.value.status_code == 400
-        assert exc_info.value.detail == "The category with this slug already exists in the system."
+        assert (
+            exc_info.value.detail
+            == "The category with this slug already exists in the system."
+        )
 
 
 @pytest.mark.asyncio
 async def test_create_category_invalid_data():
     """Test creation of a category with invalid data."""
-    # Mock database session
-    mock_db = AsyncMock(spec=AsyncSession)
-
-    # Test with missing name
-    category_data = CategoryCreate(name="", slug="tech")
-
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+    ) as mock_get_all:
         mock_get_all.return_value = []
 
-        # Verify that validation will be handled by Pydantic before reaching the function
-        # This test is more of a placeholder since Pydantic validation happens before the function call
+        # This test is more of a placeholder
+        # since Pydantic validation happens before the function call
         pass
 
 
@@ -135,7 +145,9 @@ async def test_get_categories_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+    ) as mock_get_all:
         mock_get_all.return_value = mock_categories
 
         # Call the endpoint
@@ -160,7 +172,9 @@ async def test_get_categories_with_pagination():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+    ) as mock_get_all:
         mock_get_all.return_value = mock_categories
 
         # Call the endpoint with custom pagination
@@ -181,7 +195,9 @@ async def test_get_categories_empty_result():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+    ) as mock_get_all:
         mock_get_all.return_value = mock_categories
 
         # Call the endpoint
@@ -203,7 +219,9 @@ async def test_get_category_by_id_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+    ) as mock_get_by_id:
         mock_get_by_id.return_value = mock_category
 
         # Call the endpoint
@@ -225,7 +243,9 @@ async def test_get_category_by_id_not_found():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+    ) as mock_get_by_id:
         mock_get_by_id.return_value = None
 
         # Verify that the exception is raised
@@ -240,9 +260,6 @@ async def test_get_category_by_id_not_found():
 @pytest.mark.asyncio
 async def test_get_category_by_id_invalid_uuid():
     """Test retrieval of a category with invalid UUID."""
-    # Mock database session
-    mock_db = AsyncMock(spec=AsyncSession)
-
     # Test with invalid UUID - this will be handled by FastAPI validation
     # before reaching the function, so this test is more of a placeholder
     pass
@@ -262,12 +279,20 @@ async def test_update_category_success():
 
     # Mock the category CRUD functions
     with (
-        patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id,
-        patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all,
-        patch("app.api.v1.endpoints.categories.category_crud.update_category") as mock_update,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+        ) as mock_get_by_id,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+        ) as mock_get_all,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.update_category"
+        ) as mock_update,
     ):
         mock_get_by_id.return_value = existing_category
-        mock_get_all.return_value = [existing_category]  # Only the category being updated
+        mock_get_all.return_value = [
+            existing_category
+        ]  # Only the category being updated
         mock_update.return_value = updated_category
 
         # Call the endpoint
@@ -293,7 +318,9 @@ async def test_update_category_not_found():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+    ) as mock_get_by_id:
         mock_get_by_id.return_value = None
 
         # Verify that the exception is raised
@@ -304,7 +331,10 @@ async def test_update_category_not_found():
 
         # Assertions
         assert exc_info.value.status_code == 404
-        assert exc_info.value.detail == "The category with this id does not exist in the system"
+        assert (
+            exc_info.value.detail
+            == "The category with this id does not exist in the system"
+        )
 
 
 @pytest.mark.asyncio
@@ -321,8 +351,12 @@ async def test_update_category_duplicate_name():
 
     # Mock the category CRUD functions
     with (
-        patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id,
-        patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+        ) as mock_get_by_id,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+        ) as mock_get_all,
     ):
         mock_get_by_id.return_value = existing_category
         mock_get_all.return_value = [existing_category, conflicting_category]
@@ -335,7 +369,10 @@ async def test_update_category_duplicate_name():
 
         # Assertions
         assert exc_info.value.status_code == 400
-        assert exc_info.value.detail == "The category with this name already exists in the system."
+        assert (
+            exc_info.value.detail
+            == "The category with this name already exists in the system."
+        )
 
 
 @pytest.mark.asyncio
@@ -352,8 +389,12 @@ async def test_update_category_duplicate_slug():
 
     # Mock the category CRUD functions
     with (
-        patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id,
-        patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+        ) as mock_get_by_id,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+        ) as mock_get_all,
     ):
         mock_get_by_id.return_value = existing_category
         mock_get_all.return_value = [existing_category, conflicting_category]
@@ -366,7 +407,10 @@ async def test_update_category_duplicate_slug():
 
         # Assertions
         assert exc_info.value.status_code == 400
-        assert exc_info.value.detail == "The category with this slug already exists in the system."
+        assert (
+            exc_info.value.detail
+            == "The category with this slug already exists in the system."
+        )
 
 
 @pytest.mark.asyncio
@@ -395,20 +439,23 @@ async def test_update_category_invalid_data():
     """Test update of a category with invalid data."""
     # Mock data
     category_id = uuid.uuid4()
-    update_data = CategoryUpdate(name="")  # Empty name
-
-    # Mock database session
-    mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+    ) as mock_get_by_id:
         mock_get_by_id.return_value = Category(id=category_id, name="Tech", slug="tech")
 
         # Mock get_all_categories to return only the current category
-        with patch("app.api.v1.endpoints.categories.category_crud.get_all_categories") as mock_get_all:
-            mock_get_all.return_value = [Category(id=category_id, name="Tech", slug="tech")]
+        with patch(
+            "app.api.v1.endpoints.categories.category_crud.get_all_categories"
+        ) as mock_get_all:
+            mock_get_all.return_value = [
+                Category(id=category_id, name="Tech", slug="tech")
+            ]
 
-            # This test is more of a placeholder since Pydantic validation happens before the function call
+            # This test is more of a placeholder
+            # since Pydantic validation happens before the function call
             pass
 
 
@@ -424,8 +471,12 @@ async def test_delete_category_success():
 
     # Mock the category CRUD functions
     with (
-        patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id,
-        patch("app.api.v1.endpoints.categories.category_crud.delete_category") as mock_delete,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+        ) as mock_get_by_id,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.delete_category"
+        ) as mock_delete,
     ):
         mock_get_by_id.return_value = mock_category
         mock_delete.return_value = True
@@ -449,7 +500,9 @@ async def test_delete_category_not_found():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+    ) as mock_get_by_id:
         mock_get_by_id.return_value = None
 
         # Verify that the exception is raised
@@ -468,8 +521,18 @@ async def test_get_category_posts_success():
     category_id = uuid.uuid4()
     mock_category = Category(id=category_id, name="Tech", slug="tech")
     mock_posts = [
-        Post(id=uuid.uuid4(), title="Post 1", content="Content 1", category_id=category_id),
-        Post(id=uuid.uuid4(), title="Post 2", content="Content 2", category_id=category_id),
+        Post(
+            id=uuid.uuid4(),
+            title="Post 1",
+            content="Content 1",
+            category_id=category_id,
+        ),
+        Post(
+            id=uuid.uuid4(),
+            title="Post 2",
+            content="Content 2",
+            category_id=category_id,
+        ),
     ]
 
     # Mock database session
@@ -477,8 +540,12 @@ async def test_get_category_posts_success():
 
     # Mock the category CRUD and post functions
     with (
-        patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id,
-        patch("app.api.v1.endpoints.categories.get_posts_by_category") as mock_get_posts,
+        patch(
+            "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+        ) as mock_get_by_id,
+        patch(
+            "app.api.v1.endpoints.categories.get_posts_by_category"
+        ) as mock_get_posts,
     ):
         mock_get_by_id.return_value = mock_category
         mock_get_posts.return_value = mock_posts
@@ -504,7 +571,9 @@ async def test_get_category_posts_category_not_found():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the category CRUD function
-    with patch("app.api.v1.endpoints.categories.category_crud.get_category_by_id") as mock_get_by_id:
+    with patch(
+        "app.api.v1.endpoints.categories.category_crud.get_category_by_id"
+    ) as mock_get_by_id:
         mock_get_by_id.return_value = None
 
         # Verify that the exception is raised

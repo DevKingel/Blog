@@ -44,7 +44,9 @@ async def admin_user(db_session: AsyncSession) -> User:
     admin_role = result.scalar_one_or_none()
 
     if not admin_role:
-        admin_role = Role(id=uuid.uuid4(), name="admin", description="Administrator role")
+        admin_role = Role(
+            id=uuid.uuid4(), name="admin", description="Administrator role"
+        )
         db_session.add(admin_role)
         await db_session.commit()
         await db_session.refresh(admin_role)
@@ -79,7 +81,9 @@ async def admin_user(db_session: AsyncSession) -> User:
 async def regular_user(db_session: AsyncSession) -> User:
     """Create a test regular user."""
     # Check if regular user already exists
-    result = await db_session.execute(select(User).where(User.username == "regular_user"))
+    result = await db_session.execute(
+        select(User).where(User.username == "regular_user")
+    )
     regular_user = result.scalar_one_or_none()
 
     if not regular_user:
@@ -105,7 +109,9 @@ async def test_users(db_session: AsyncSession) -> list[User]:
     users = []
     for i in range(5):
         # Check if user already exists
-        result = await db_session.execute(select(User).where(User.username == f"test_user_{i}"))
+        result = await db_session.execute(
+            select(User).where(User.username == f"test_user_{i}")
+        )
         user = result.scalar_one_or_none()
 
         if not user:
@@ -127,7 +133,9 @@ async def test_users(db_session: AsyncSession) -> list[User]:
             await db_session.refresh(user)
 
     # Get all test users
-    result = await db_session.execute(select(User).where(User.username.like("test_user_%")))
+    result = await db_session.execute(
+        select(User).where(User.username.like("test_user_%"))
+    )
     return list(result.scalars().all())
 
 
@@ -137,7 +145,9 @@ async def test_posts(db_session: AsyncSession, regular_user: User) -> list[Post]
     posts = []
     for i in range(5):
         # Check if post already exists
-        result = await db_session.execute(select(Post).where(Post.title == f"Test Post {i}"))
+        result = await db_session.execute(
+            select(Post).where(Post.title == f"Test Post {i}")
+        )
         post = result.scalar_one_or_none()
 
         if not post:
@@ -157,7 +167,9 @@ async def test_posts(db_session: AsyncSession, regular_user: User) -> list[Post]
             await db_session.refresh(post)
 
     # Get all test posts
-    result = await db_session.execute(select(Post).where(Post.title.like("Test Post %")))
+    result = await db_session.execute(
+        select(Post).where(Post.title.like("Test Post %"))
+    )
     return list(result.scalars().all())
 
 
@@ -254,7 +266,9 @@ def test_delete_any_user_success(admin_user: User, test_users: list[User]):
 
     # Delete the first test user
     user_to_delete = test_users[0]
-    response = client.delete(f"/api/v1/admin/users/{user_to_delete.id}", headers=headers)
+    response = client.delete(
+        f"/api/v1/admin/users/{user_to_delete.id}", headers=headers
+    )
     assert response.status_code == 204
 
 
@@ -281,7 +295,9 @@ def test_delete_any_user_self_deletion_forbidden(admin_user: User):
     assert response.status_code == 400
 
 
-def test_delete_any_user_non_admin_forbidden(regular_user: User, test_users: list[User]):
+def test_delete_any_user_non_admin_forbidden(
+    regular_user: User, test_users: list[User]
+):
     """Test that non-admin users cannot delete users."""
     if not test_users:
         pytest.skip("No test users available")
@@ -292,7 +308,9 @@ def test_delete_any_user_non_admin_forbidden(regular_user: User, test_users: lis
 
     # Try to delete a user
     user_to_delete = test_users[0]
-    response = client.delete(f"/api/v1/admin/users/{user_to_delete.id}", headers=headers)
+    response = client.delete(
+        f"/api/v1/admin/users/{user_to_delete.id}", headers=headers
+    )
     assert response.status_code == 403
 
 
@@ -372,7 +390,9 @@ def test_delete_any_post_success(admin_user: User, test_posts: list[Post]):
 
     # Delete the first test post
     post_to_delete = test_posts[0]
-    response = client.delete(f"/api/v1/admin/posts/{post_to_delete.id}", headers=headers)
+    response = client.delete(
+        f"/api/v1/admin/posts/{post_to_delete.id}", headers=headers
+    )
     assert response.status_code == 204
 
 
@@ -388,7 +408,9 @@ def test_delete_any_post_not_found(admin_user: User):
     assert response.status_code == 404
 
 
-def test_delete_any_post_non_admin_forbidden(regular_user: User, test_posts: list[Post]):
+def test_delete_any_post_non_admin_forbidden(
+    regular_user: User, test_posts: list[Post]
+):
     """Test that non-admin users cannot delete posts."""
     if not test_posts:
         pytest.skip("No test posts available")
@@ -399,7 +421,9 @@ def test_delete_any_post_non_admin_forbidden(regular_user: User, test_posts: lis
 
     # Try to delete a post
     post_to_delete = test_posts[0]
-    response = client.delete(f"/api/v1/admin/posts/{post_to_delete.id}", headers=headers)
+    response = client.delete(
+        f"/api/v1/admin/posts/{post_to_delete.id}", headers=headers
+    )
     assert response.status_code == 403
 
 

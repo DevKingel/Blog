@@ -25,13 +25,13 @@ async def search_posts(
 ):
     """
     Search posts by query string in title or content.
-    
+
     Args:
         query: Search query string
         skip: Number of records to skip (for pagination)
         limit: Maximum number of records to return (for pagination)
         db: Database session
-        
+
     Returns:
         PostSearchResult: Search results with posts and total count
     """
@@ -48,13 +48,13 @@ async def search_users(
 ):
     """
     Search users by query string in username or email.
-    
+
     Args:
         query: Search query string
         skip: Number of records to skip (for pagination)
         limit: Maximum number of records to return (for pagination)
         db: Database session
-        
+
     Returns:
         UserSearchResult: Search results with users and total count
     """
@@ -71,17 +71,19 @@ async def search_categories(
 ):
     """
     Search categories by query string in name.
-    
+
     Args:
         query: Search query string
         skip: Number of records to skip (for pagination)
         limit: Maximum number of records to return (for pagination)
         db: Database session
-        
+
     Returns:
         CategorySearchResult: Search results with categories and total count
     """
-    categories, total = await category_crud.search_categories(db, query=query, skip=skip, limit=limit)
+    categories, total = await category_crud.search_categories(
+        db, query=query, skip=skip, limit=limit
+    )
     return CategorySearchResult(categories=categories, total=total)
 
 
@@ -94,13 +96,13 @@ async def search_tags(
 ):
     """
     Search tags by query string in name.
-    
+
     Args:
         query: Search query string
         skip: Number of records to skip (for pagination)
         limit: Maximum number of records to return (for pagination)
         db: Database session
-        
+
     Returns:
         TagSearchResult: Search results with tags and total count
     """

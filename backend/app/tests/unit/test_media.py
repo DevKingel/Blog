@@ -80,7 +80,9 @@ async def test_upload_media_file_too_large():
     mock_file.filename = "large.jpg"
     mock_file.file = Mock()
     mock_file.file.seek = Mock()
-    mock_file.file.tell = Mock(return_value=15 * 1024 * 1024)  # 15MB (exceeds 10MB limit)
+    mock_file.file.tell = Mock(
+        return_value=15 * 1024 * 1024
+    )  # 15MB (exceeds 10MB limit)
 
     # Create a mock database session
     mock_db = AsyncMock()
@@ -120,8 +122,15 @@ async def test_upload_media_db_error():
             # Mock file removal
             with patch("app.api.v1.endpoints.media.os.remove") as mock_remove:
                 # Call the endpoint and expect exception
-                with pytest.raises(Exception):
+                with pytest.raises(HTTPException) as exc_info:
                     await upload_media(file=mock_file, db=mock_db)
+
+                # Assertions
+                assert exc_info.value.status_code == 500
+                assert (
+                    exc_info.value.detail
+                    == "Internal server error while uploading media"
+                )
 
                 # Verify file cleanup occurred
                 mock_remove.assert_called_once()
@@ -147,8 +156,12 @@ async def test_upload_media_file_write_error():
         mock_open.side_effect = Exception("File write error")
 
         # Call the endpoint and expect exception
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await upload_media(file=mock_file, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while uploading media"
 
 
 @pytest.mark.asyncio
@@ -261,8 +274,12 @@ async def test_list_media_db_error():
         mock_get_all_media.side_effect = Exception("Database error")
 
         # Call the endpoint and expect exception
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await list_media(skip=0, limit=100, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while listing media"
 
 
 @pytest.mark.asyncio
@@ -452,8 +469,12 @@ async def test_delete_media_db_error():
         mock_delete_media.side_effect = Exception("Database error")
 
         # Call the endpoint and expect exception
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await delete_media(media_id=media_id, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while deleting media"
 
         # Verify file was deleted but exception was raised
         mock_remove.assert_called_once()

@@ -26,7 +26,9 @@ async def db_session() -> Generator[AsyncSession]:
 async def test_user(db_session: AsyncSession) -> User:
     """Create a test user."""
     # Check if user already exists
-    result = await db_session.execute(select(User).where(User.username == "test_user_stats"))
+    result = await db_session.execute(
+        select(User).where(User.username == "test_user_stats")
+    )
     user = result.scalar_one_or_none()
 
     if not user:
@@ -50,7 +52,9 @@ async def test_user(db_session: AsyncSession) -> User:
 async def test_post(db_session: AsyncSession, test_user: User) -> Post:
     """Create a test post."""
     # Check if post already exists
-    result = await db_session.execute(select(Post).where(Post.title == "Test Post for Stats"))
+    result = await db_session.execute(
+        select(Post).where(Post.title == "Test Post for Stats")
+    )
     post = result.scalar_one_or_none()
 
     if not post:
@@ -193,7 +197,7 @@ def test_remove_post_like_success(test_stat: Stat):
 
     response = client.delete(f"/api/v1/stats/posts/{test_stat.post_id}/like")
     assert response.status_code == 204
-    assert response.content == b''  # Empty response body
+    assert response.content == b""  # Empty response body
 
 
 def test_remove_post_like_not_found():

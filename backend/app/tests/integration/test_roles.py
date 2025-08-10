@@ -71,9 +71,7 @@ async def test_roles(db_session: AsyncSession) -> list[Role]:
 
         if not role:
             role = Role(
-                id=uuid.uuid4(),
-                name=name,
-                description=f"{name.capitalize()} role"
+                id=uuid.uuid4(), name=name, description=f"{name.capitalize()} role"
             )
             db_session.add(role)
             roles.append(role)
@@ -263,7 +261,9 @@ def test_update_role_not_found(admin_user: User):
     fake_role_id = uuid.uuid4()
     update_data = {"name": "updated_role"}
 
-    response = client.put(f"/api/v1/roles/{fake_role_id}", json=update_data, headers=headers)
+    response = client.put(
+        f"/api/v1/roles/{fake_role_id}", json=update_data, headers=headers
+    )
     assert response.status_code == 404
     assert "not found" in response.json()["detail"]
 
@@ -283,7 +283,9 @@ def test_update_role_duplicate_name(admin_user: User, test_roles: list[Role]):
     # Try to update role1 to have the same name as role2
     update_data = {"name": role2.name}
 
-    response = client.put(f"/api/v1/roles/{role1.id}", json=update_data, headers=headers)
+    response = client.put(
+        f"/api/v1/roles/{role1.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 400
     assert "already exists" in response.json()["detail"]
 

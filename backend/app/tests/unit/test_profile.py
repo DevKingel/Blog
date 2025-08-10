@@ -112,7 +112,11 @@ async def test_update_current_user_profile_success():
         assert result.username == "updateduser"
         assert result.email == "updated@example.com"
         mock_get_user.assert_called_once_with(mock_db, user_id)
-        mock_update_user.assert_called_once_with(mock_db, user_id, {"username": "updateduser", "email": "updated@example.com"})
+        mock_update_user.assert_called_once_with(
+            mock_db,
+            user_id,
+            {"username": "updateduser", "email": "updated@example.com"},
+        )
 
 
 @pytest.mark.asyncio
@@ -179,7 +183,9 @@ async def test_update_current_user_profile_user_not_found_update():
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         assert exc_info.value.detail == "User not found"
         mock_get_user.assert_called_once_with(mock_db, user_id)
-        mock_update_user.assert_called_once_with(mock_db, user_id, {"username": "updateduser"})
+        mock_update_user.assert_called_once_with(
+            mock_db, user_id, {"username": "updateduser"}
+        )
 
 
 @pytest.mark.asyncio
@@ -222,7 +228,9 @@ async def test_update_current_user_profile_invalid_data():
         # Assertions
         assert isinstance(result, ProfileRead)
         mock_get_user.assert_called_once_with(mock_db, user_id)
-        mock_update_user.assert_called_once_with(mock_db, user_id, {"username": "validuser", "email": "valid@example.com"})
+        mock_update_user.assert_called_once_with(
+            mock_db, user_id, {"username": "validuser", "email": "valid@example.com"}
+        )
 
 
 @pytest.mark.asyncio
@@ -270,4 +278,6 @@ async def test_update_current_user_profile_partial_update():
         assert result.username == "updateduser"
         assert result.email == "test@example.com"  # Should remain unchanged
         mock_get_user.assert_called_once_with(mock_db, user_id)
-        mock_update_user.assert_called_once_with(mock_db, user_id, {"username": "updateduser"})
+        mock_update_user.assert_called_once_with(
+            mock_db, user_id, {"username": "updateduser"}
+        )

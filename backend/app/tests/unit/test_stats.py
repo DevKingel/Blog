@@ -21,18 +21,15 @@ async def test_get_post_statistics_success():
     """Test successful retrieval of post statistics."""
     # Mock data
     post_id = uuid.uuid4()
-    mock_stat = Stat(
-        id=uuid.uuid4(),
-        post_id=post_id,
-        views=10,
-        likes=5
-    )
+    mock_stat = Stat(id=uuid.uuid4(), post_id=post_id, views=10, likes=5)
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function
-    with patch("app.api.v1.endpoints.stats.stat_crud.get_stat_by_post_id") as mock_get_stat:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.get_stat_by_post_id"
+    ) as mock_get_stat:
         mock_get_stat.return_value = mock_stat
 
         # Call the endpoint
@@ -56,7 +53,9 @@ async def test_get_post_statistics_not_found():
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function to raise HTTPException
-    with patch("app.api.v1.endpoints.stats.stat_crud.get_stat_by_post_id") as mock_get_stat:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.get_stat_by_post_id"
+    ) as mock_get_stat:
         mock_get_stat.side_effect = HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Stat not found"
         )
@@ -79,14 +78,16 @@ async def test_get_user_statistics_success():
         "user_id": user_id,
         "total_posts": 5,
         "total_views": 100,
-        "total_likes": 50
+        "total_likes": 50,
     }
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function
-    with patch("app.api.v1.endpoints.stats.stat_crud.get_user_stats") as mock_get_user_stats:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.get_user_stats"
+    ) as mock_get_user_stats:
         mock_get_user_stats.return_value = mock_user_stats
 
         # Call the endpoint
@@ -111,7 +112,9 @@ async def test_get_user_statistics_not_found():
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function to raise HTTPException
-    with patch("app.api.v1.endpoints.stats.stat_crud.get_user_stats") as mock_get_user_stats:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.get_user_stats"
+    ) as mock_get_user_stats:
         mock_get_user_stats.side_effect = HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
@@ -133,14 +136,16 @@ async def test_get_site_statistics_success():
         "total_posts": 100,
         "total_users": 50,
         "total_views": 1000,
-        "total_likes": 500
+        "total_likes": 500,
     }
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function
-    with patch("app.api.v1.endpoints.stats.stat_crud.get_site_stats") as mock_get_site_stats:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.get_site_stats"
+    ) as mock_get_site_stats:
         mock_get_site_stats.return_value = mock_site_stats
 
         # Call the endpoint
@@ -164,14 +169,16 @@ async def test_record_post_view_success():
         id=uuid.uuid4(),
         post_id=post_id,
         views=11,  # Incremented from 10 to 11
-        likes=5
+        likes=5,
     )
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function
-    with patch("app.api.v1.endpoints.stats.stat_crud.increment_post_views") as mock_increment_views:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.increment_post_views"
+    ) as mock_increment_views:
         mock_increment_views.return_value = mock_stat
 
         # Call the endpoint
@@ -193,7 +200,9 @@ async def test_record_post_view_not_found():
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function to raise HTTPException
-    with patch("app.api.v1.endpoints.stats.stat_crud.increment_post_views") as mock_increment_views:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.increment_post_views"
+    ) as mock_increment_views:
         mock_increment_views.side_effect = HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Stat not found"
         )
@@ -216,14 +225,16 @@ async def test_record_post_like_success():
         id=uuid.uuid4(),
         post_id=post_id,
         views=10,
-        likes=6  # Incremented from 5 to 6
+        likes=6,  # Incremented from 5 to 6
     )
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function
-    with patch("app.api.v1.endpoints.stats.stat_crud.increment_post_likes") as mock_increment_likes:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.increment_post_likes"
+    ) as mock_increment_likes:
         mock_increment_likes.return_value = mock_stat
 
         # Call the endpoint
@@ -245,7 +256,9 @@ async def test_record_post_like_not_found():
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function to raise HTTPException
-    with patch("app.api.v1.endpoints.stats.stat_crud.increment_post_likes") as mock_increment_likes:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.increment_post_likes"
+    ) as mock_increment_likes:
         mock_increment_likes.side_effect = HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Stat not found"
         )
@@ -268,14 +281,16 @@ async def test_remove_post_like_success():
         id=uuid.uuid4(),
         post_id=post_id,
         views=10,
-        likes=4  # Decremented from 5 to 4
+        likes=4,  # Decremented from 5 to 4
     )
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function
-    with patch("app.api.v1.endpoints.stats.stat_crud.decrement_post_likes") as mock_decrement_likes:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.decrement_post_likes"
+    ) as mock_decrement_likes:
         mock_decrement_likes.return_value = mock_stat
 
         # Call the endpoint
@@ -296,7 +311,9 @@ async def test_remove_post_like_not_found():
     mock_db = AsyncMock()
 
     # Mock the stat CRUD function to raise HTTPException
-    with patch("app.api.v1.endpoints.stats.stat_crud.decrement_post_likes") as mock_decrement_likes:
+    with patch(
+        "app.api.v1.endpoints.stats.stat_crud.decrement_post_likes"
+    ) as mock_decrement_likes:
         mock_decrement_likes.side_effect = HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Stat not found"
         )

@@ -81,8 +81,7 @@ def test_upload_media_success(temp_media_file):
     """Test successful media upload."""
     with open(temp_media_file, "rb") as file:
         response = client.post(
-            "/api/v1/media/",
-            files={"file": ("test_image.jpg", file, "image/jpeg")}
+            "/api/v1/media/", files={"file": ("test_image.jpg", file, "image/jpeg")}
         )
 
     assert response.status_code == 201
@@ -107,7 +106,7 @@ def test_upload_media_invalid_content_type():
         with open(temp_file_path, "rb") as file:
             response = client.post(
                 "/api/v1/media/",
-                files={"file": ("malicious.exe", file, "application/exe")}
+                files={"file": ("malicious.exe", file, "application/exe")},
             )
 
         assert response.status_code == 400
@@ -122,8 +121,7 @@ def test_upload_media_file_too_large(large_media_file):
     """Test media upload with file that exceeds size limit."""
     with open(large_media_file, "rb") as file:
         response = client.post(
-            "/api/v1/media/",
-            files={"file": ("large_file.jpg", file, "image/jpeg")}
+            "/api/v1/media/", files={"file": ("large_file.jpg", file, "image/jpeg")}
         )
 
     assert response.status_code == 413
@@ -163,7 +161,8 @@ def test_list_media_empty_result():
     assert response.json() == []
 
 
-# Integration tests for DELETE /{media_id} - Delete a media entry and its associated file
+# Integration tests for DELETE /{media_id}
+# Delete a media entry and its associated file
 async def test_delete_media_success(db_session: AsyncSession, test_media: Media):
     """Test successful deletion of media."""
     # First, let's create a temporary file to simulate the media file
@@ -179,11 +178,14 @@ async def test_delete_media_success(db_session: AsyncSession, test_media: Media)
         assert response.status_code == 204
 
         # Verify the media entry no longer exists in the database
-        result = await db_session.execute(select(Media).where(Media.id == test_media.id))
+        result = await db_session.execute(
+            select(Media).where(Media.id == test_media.id)
+        )
         media = result.scalars().first()
         assert media is None
 
-        # Verify the file was deleted (this might not work in tests without proper setup)
+        # Verify the file was deleted
+        # (this might not work in tests without proper setup)
         # We'll check that the file operation was at least attempted
     finally:
         # Cleanup: remove the temporary file if it still exists

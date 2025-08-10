@@ -29,7 +29,9 @@ async def test_posts(db_session: AsyncSession) -> list[Post]:
     posts = []
     for i in range(3):
         # Check if post already exists
-        result = await db_session.execute(select(Post).where(Post.title == f"Test Post {i}"))
+        result = await db_session.execute(
+            select(Post).where(Post.title == f"Test Post {i}")
+        )
         post = result.scalar_one_or_none()
 
         if not post:
@@ -52,7 +54,9 @@ async def test_posts(db_session: AsyncSession) -> list[Post]:
             await db_session.refresh(post)
 
     # Get all test posts
-    result = await db_session.execute(select(Post).where(Post.title.like("Test Post %")))
+    result = await db_session.execute(
+        select(Post).where(Post.title.like("Test Post %"))
+    )
     return list(result.scalars().all())
 
 
@@ -84,7 +88,9 @@ async def test_users(db_session: AsyncSession) -> list[User]:
             await db_session.refresh(user)
 
     # Get all test users
-    result = await db_session.execute(select(User).where(User.username.like("test_user_%")))
+    result = await db_session.execute(
+        select(User).where(User.username.like("test_user_%"))
+    )
     return list(result.scalars().all())
 
 
@@ -127,7 +133,9 @@ async def test_tags(db_session: AsyncSession) -> list[Tag]:
     tags = []
     for i in range(3):
         # Check if tag already exists
-        result = await db_session.execute(select(Tag).where(Tag.name == f"Test Tag {i}"))
+        result = await db_session.execute(
+            select(Tag).where(Tag.name == f"Test Tag {i}")
+        )
         tag = result.scalar_one_or_none()
 
         if not tag:

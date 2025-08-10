@@ -19,11 +19,7 @@ async def get_post_statistics(
     Get statistics for a specific post.
     """
     stat = await stat_crud.get_stat_by_post_id(db, post_id=post_id)
-    return PostStatsRead(
-        post_id=stat.post_id,
-        views=stat.views,
-        likes=stat.likes
-    )
+    return PostStatsRead(post_id=stat.post_id, views=stat.views, likes=stat.likes)
 
 
 @router.get("/users/{user_id}", response_model=UserStatsRead)
@@ -81,5 +77,5 @@ async def remove_post_like(
     """
     Remove a post like.
     """
-    stat = await stat_crud.decrement_post_likes(db, post_id=post_id)
+    await stat_crud.decrement_post_likes(db, post_id=post_id)
     return None

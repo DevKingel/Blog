@@ -1,11 +1,15 @@
+from fastapi import Depends
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.db.session import get_session
 from app.models.category import Category
 
 
-async def create_category(db: AsyncSession, category_data: dict) -> Category:
+async def create_category(
+    category_data: dict, db: AsyncSession = Depends(get_session)
+) -> Category:
     """
     Create a new category in the database.
 
@@ -23,7 +27,9 @@ async def create_category(db: AsyncSession, category_data: dict) -> Category:
     return category
 
 
-async def get_category_by_id(db: AsyncSession, category_id: str) -> Category | None:
+async def get_category_by_id(
+    category_id: str, db: AsyncSession = Depends(get_session)
+) -> Category | None:
     """
     Get a category by its ID from the database.
     """
@@ -33,7 +39,7 @@ async def get_category_by_id(db: AsyncSession, category_id: str) -> Category | N
 
 
 async def get_all_categories(
-    db: AsyncSession, *, skip: int = 0, limit: int = 100
+    db: AsyncSession = Depends(get_session), *, skip: int = 0, limit: int = 100
 ) -> list[Category]:
     """
     Get all categories with pagination.
@@ -51,7 +57,7 @@ async def get_all_categories(
 
 
 async def update_category(
-    db: AsyncSession, category_id: str, category_data: dict
+    category_id: str, category_data: dict, db: AsyncSession = Depends(get_session)
 ) -> Category | None:
     """
     Update a category in the database.
@@ -64,7 +70,7 @@ async def update_category(
     Returns:
         Optional[Category]: The updated category object if found, None otherwise.
     """
-    category = await get_category_by_id(db, category_id)
+    category = await get_category_by_id(category_id, db)
     if not category:
         return None
     for key, value in category_data.items():
@@ -75,11 +81,13 @@ async def update_category(
     return category
 
 
-async def delete_category(db: AsyncSession, category_id: str) -> bool:
+async def delete_category(
+    category_id: str, db: AsyncSession = Depends(get_session)
+) -> bool:
     """
     Delete a category from the database.
     """
-    category = await get_category_by_id(db, category_id)
+    category = await get_category_by_id(category_id, db)
     if not category:
         return False
     await db.delete(category)
@@ -88,7 +96,11 @@ async def delete_category(db: AsyncSession, category_id: str) -> bool:
 
 
 async def search_categories(
-    db: AsyncSession, *, query: str, skip: int = 0, limit: int = 100
+    *,
+    query: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_session),
 ) -> tuple[list[Category], int]:
     """
     Search categories by query string (name).

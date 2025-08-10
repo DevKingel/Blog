@@ -1,16 +1,18 @@
 from uuid import UUID
 
+from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.db.session import get_session
 from app.models.post import Post
 from app.models.stat import Stat
 from app.models.user import User
 
 
-async def create_stat(db: AsyncSession, stat_data: dict) -> Stat:
+async def create_stat(stat_data: dict, db: AsyncSession = Depends(get_session)) -> Stat:
     """
     Create a new stat record.
 
@@ -28,7 +30,9 @@ async def create_stat(db: AsyncSession, stat_data: dict) -> Stat:
     return stat
 
 
-async def get_stat_by_id(db: AsyncSession, stat_id: UUID) -> Stat:
+async def get_stat_by_id(
+    stat_id: UUID, db: AsyncSession = Depends(get_session)
+) -> Stat:
     """
     Get a stat record by ID.
 
@@ -50,7 +54,9 @@ async def get_stat_by_id(db: AsyncSession, stat_id: UUID) -> Stat:
     return stat
 
 
-async def get_stat_by_post_id(db: AsyncSession, post_id: UUID) -> Stat:
+async def get_stat_by_post_id(
+    post_id: UUID, db: AsyncSession = Depends(get_session)
+) -> Stat:
     """
     Get a stat record by post ID.
 
@@ -69,7 +75,7 @@ async def get_stat_by_post_id(db: AsyncSession, post_id: UUID) -> Stat:
     stat = result.scalars().first()
     if not stat:
         # Create a new stat record if it doesn't exist
-        stat = await create_stat(db, {"post_id": post_id})
+        stat = await create_stat({"post_id": post_id}, db)
     return stat
 
 
@@ -88,7 +94,9 @@ async def get_all_stats(db: AsyncSession) -> list[Stat]:
     return result.scalars().all()
 
 
-async def update_stat(db: AsyncSession, stat_id: UUID, stat_data: dict) -> Stat:
+async def update_stat(
+    stat_id: UUID, stat_data: dict, db: AsyncSession = Depends(get_session)
+) -> Stat:
     """
     Update a stat record.
 
@@ -115,7 +123,7 @@ async def update_stat(db: AsyncSession, stat_id: UUID, stat_data: dict) -> Stat:
     return stat
 
 
-async def delete_stat(db: AsyncSession, stat_id: UUID) -> None:
+async def delete_stat(stat_id: UUID, db: AsyncSession = Depends(get_session)) -> None:
     """
     Delete a stat record.
 
@@ -135,7 +143,9 @@ async def delete_stat(db: AsyncSession, stat_id: UUID) -> None:
     await db.commit()
 
 
-async def increment_post_views(db: AsyncSession, post_id: UUID) -> Stat:
+async def increment_post_views(
+    post_id: UUID, db: AsyncSession = Depends(get_session)
+) -> Stat:
     """
     Increment the view count for a post.
 
@@ -146,14 +156,16 @@ async def increment_post_views(db: AsyncSession, post_id: UUID) -> Stat:
     Returns:
         Stat: The updated stat record.
     """
-    stat = await get_stat_by_post_id(db, post_id)
+    stat = await get_stat_by_post_id(post_id, db)
     stat.views += 1
     await db.commit()
     await db.refresh(stat)
     return stat
 
 
-async def increment_post_likes(db: AsyncSession, post_id: UUID) -> Stat:
+async def increment_post_likes(
+    post_id: UUID, db: AsyncSession = Depends(get_session)
+) -> Stat:
     """
     Increment the like count for a post.
 
@@ -164,14 +176,16 @@ async def increment_post_likes(db: AsyncSession, post_id: UUID) -> Stat:
     Returns:
         Stat: The updated stat record.
     """
-    stat = await get_stat_by_post_id(db, post_id)
+    stat = await get_stat_by_post_id(post_id, db)
     stat.likes += 1
     await db.commit()
     await db.refresh(stat)
     return stat
 
 
-async def decrement_post_likes(db: AsyncSession, post_id: UUID) -> Stat:
+async def decrement_post_likes(
+    post_id: UUID, db: AsyncSession = Depends(get_session)
+) -> Stat:
     """
     Decrement the like count for a post.
 
@@ -182,7 +196,7 @@ async def decrement_post_likes(db: AsyncSession, post_id: UUID) -> Stat:
     Returns:
         Stat: The updated stat record.
     """
-    stat = await get_stat_by_post_id(db, post_id)
+    stat = await get_stat_by_post_id(post_id, db)
     if stat.likes > 0:
         stat.likes -= 1
         await db.commit()
@@ -221,11 +235,13 @@ async def get_site_stats(db: AsyncSession) -> dict:
         "total_posts": total_posts,
         "total_users": total_users,
         "total_views": total_views,
-        "total_likes": total_likes
+        "total_likes": total_likes,
     }
 
 
-async def get_user_stats(db: AsyncSession, user_id: UUID) -> dict:
+async def get_user_stats(
+    user_id: UUID, db: AsyncSession = Depends(get_session)
+) -> dict:
     """
     Get statistics for a specific user.
 
@@ -254,5 +270,5 @@ async def get_user_stats(db: AsyncSession, user_id: UUID) -> dict:
         "user_id": user_id,
         "total_posts": len(user_posts),
         "total_views": total_views,
-        "total_likes": total_likes
+        "total_likes": total_likes,
     }

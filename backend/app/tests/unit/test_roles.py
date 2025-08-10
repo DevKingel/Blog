@@ -26,9 +26,10 @@ async def test_create_role_success():
     mock_db = AsyncMock()
 
     # Mock the role CRUD function
-    with patch("app.api.v1.endpoints.roles.get_all_roles") as mock_get_all_roles, patch(
-        "app.api.v1.endpoints.roles.create_role"
-    ) as mock_create_role:
+    with (
+        patch("app.api.v1.endpoints.roles.get_all_roles") as mock_get_all_roles,
+        patch("app.api.v1.endpoints.roles.create_role") as mock_create_role,
+    ):
         mock_get_all_roles.return_value = []
         mock_create_role.return_value = mock_role
 
@@ -174,15 +175,19 @@ async def test_update_role_success():
     mock_db = AsyncMock()
 
     # Mock the role CRUD functions
-    with patch("app.api.v1.endpoints.roles.get_role_by_id") as mock_get_role_by_id, patch(
-        "app.api.v1.endpoints.roles.get_all_roles"
-    ) as mock_get_all_roles, patch("app.api.v1.endpoints.roles.update_role") as mock_update_role:
+    with (
+        patch("app.api.v1.endpoints.roles.get_role_by_id") as mock_get_role_by_id,
+        patch("app.api.v1.endpoints.roles.get_all_roles") as mock_get_all_roles,
+        patch("app.api.v1.endpoints.roles.update_role") as mock_update_role,
+    ):
         mock_get_role_by_id.return_value = existing_role
         mock_get_all_roles.return_value = [existing_role]
         mock_update_role.return_value = updated_role
 
         # Call the endpoint
-        result = await update_existing_role(role_id=role_id, role_in=role_update_data, db=mock_db)
+        result = await update_existing_role(
+            role_id=role_id, role_in=role_update_data, db=mock_db
+        )
 
         # Assertions
         assert result.name == "moderator"
@@ -204,12 +209,15 @@ async def test_update_role_not_found():
     # Mock the role CRUD function to raise HTTPException
     with patch("app.api.v1.endpoints.roles.get_role_by_id") as mock_get_role_by_id:
         mock_get_role_by_id.side_effect = HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="The role with this id does not exist in the system"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The role with this id does not exist in the system",
         )
 
         # Call the endpoint and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
-            await update_existing_role(role_id=role_id, role_in=role_update_data, db=mock_db)
+            await update_existing_role(
+                role_id=role_id, role_in=role_update_data, db=mock_db
+            )
 
         # Assertions
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
@@ -230,15 +238,18 @@ async def test_update_role_duplicate_name():
     mock_db = AsyncMock()
 
     # Mock the role CRUD functions
-    with patch("app.api.v1.endpoints.roles.get_role_by_id") as mock_get_role_by_id, patch(
-        "app.api.v1.endpoints.roles.get_all_roles"
-    ) as mock_get_all_roles:
+    with (
+        patch("app.api.v1.endpoints.roles.get_role_by_id") as mock_get_role_by_id,
+        patch("app.api.v1.endpoints.roles.get_all_roles") as mock_get_all_roles,
+    ):
         mock_get_role_by_id.return_value = existing_role
         mock_get_all_roles.return_value = [existing_role, conflicting_role]
 
         # Call the endpoint and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
-            await update_existing_role(role_id=role_id, role_in=role_update_data, db=mock_db)
+            await update_existing_role(
+                role_id=role_id, role_in=role_update_data, db=mock_db
+            )
 
         # Assertions
         assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
@@ -259,7 +270,9 @@ async def test_update_role_no_data():
 
     # Call the endpoint and expect HTTPException
     with pytest.raises(HTTPException) as exc_info:
-        await update_existing_role(role_id=role_id, role_in=role_update_data, db=mock_db)
+        await update_existing_role(
+            role_id=role_id, role_in=role_update_data, db=mock_db
+        )
 
     # Assertions
     assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
@@ -277,9 +290,10 @@ async def test_delete_role_success():
     mock_db = AsyncMock()
 
     # Mock the role CRUD functions
-    with patch("app.api.v1.endpoints.roles.get_role_by_id") as mock_get_role_by_id, patch(
-        "app.api.v1.endpoints.roles.delete_role"
-    ) as mock_delete_role:
+    with (
+        patch("app.api.v1.endpoints.roles.get_role_by_id") as mock_get_role_by_id,
+        patch("app.api.v1.endpoints.roles.delete_role") as mock_delete_role,
+    ):
         mock_get_role_by_id.return_value = mock_role
         mock_delete_role.return_value = None
 

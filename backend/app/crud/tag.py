@@ -1,15 +1,16 @@
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.db.session import get_session
 from app.models.tag import Tag
 
 
-async def create_tag(db: AsyncSession, tag: Tag) -> Tag:
+async def create_tag(tag: Tag, db: AsyncSession = Depends(get_session)) -> Tag:
     """
     Create a new tag.
 
@@ -26,7 +27,9 @@ async def create_tag(db: AsyncSession, tag: Tag) -> Tag:
     return tag
 
 
-async def get_tag_by_id(db: AsyncSession, tag_id: UUID) -> Tag | None:
+async def get_tag_by_id(
+    tag_id: UUID, db: AsyncSession = Depends(get_session)
+) -> Tag | None:
     """
     Get a tag by its ID.
 
@@ -43,16 +46,18 @@ async def get_tag_by_id(db: AsyncSession, tag_id: UUID) -> Tag | None:
 
 
 async def search_tags(
-    db: AsyncSession, *, query: str, skip: int = 0, limit: int = 100
+    *,
+    query: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_session),
 ) -> tuple[list[Tag], int]:
     """
     Search tags by query string (name).
     """
     # Create the search query
     search_query = (
-        select(Tag)
-        .where(Tag.name.ilike(f"%{query}%"))
-        .options(selectinload(Tag.posts))
+        select(Tag).where(Tag.name.ilike(f"%{query}%")).options(selectinload(Tag.posts))
     )
 
     # Get total count
@@ -83,7 +88,9 @@ async def get_all_tags(db: AsyncSession) -> list[Tag]:
     return result.scalars().all()
 
 
-async def update_tag(db: AsyncSession, tag_id: UUID, tag_update: dict) -> Tag | None:
+async def update_tag(
+    tag_id: UUID, tag_update: dict, db: AsyncSession = Depends(get_session)
+) -> Tag | None:
     """
     Update a tag.
 
@@ -107,7 +114,7 @@ async def update_tag(db: AsyncSession, tag_id: UUID, tag_update: dict) -> Tag | 
     return tag
 
 
-async def delete_tag(db: AsyncSession, tag_id: UUID) -> bool:
+async def delete_tag(tag_id: UUID, db: AsyncSession = Depends(get_session)) -> bool:
     """
     Delete a tag.
 
@@ -128,7 +135,9 @@ async def delete_tag(db: AsyncSession, tag_id: UUID) -> bool:
     return True
 
 
-async def get_tag_by_name_or_slug(db: AsyncSession, name: str, slug: str) -> Tag | None:
+async def get_tag_by_name_or_slug(
+    name: str, slug: str, db: AsyncSession = Depends(get_session)
+) -> Tag | None:
     """
     Get a tag by its name or slug.
 

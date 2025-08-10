@@ -23,7 +23,9 @@ async def create_new_tag(
     Create a new tag.
     """
     # Check if tag with this name or slug already exists
-    existing_tag = await tag_crud.get_tag_by_name_or_slug(db, name=tag_in.name, slug=tag_in.slug)
+    existing_tag = await tag_crud.get_tag_by_name_or_slug(
+        db, name=tag_in.name, slug=tag_in.slug
+    )
     if existing_tag:
         raise HTTPException(
             status_code=400,
@@ -84,9 +86,7 @@ async def update_existing_tag(
     # Check if another tag with the same name or slug already exists
     if tag_in.name or tag_in.slug:
         existing_tag = await tag_crud.get_tag_by_name_or_slug(
-            db,
-            name=tag_in.name or db_tag.name,
-            slug=tag_in.slug or db_tag.slug
+            db, name=tag_in.name or db_tag.name, slug=tag_in.slug or db_tag.slug
         )
         if existing_tag and existing_tag.id != tag_id:
             raise HTTPException(

@@ -50,7 +50,9 @@ async def test_users(db_session: AsyncSession) -> list[User]:
     users = []
     for i in range(3):
         # Check if user already exists
-        result = await db_session.execute(select(User).where(User.username == f"test_user_{i}"))
+        result = await db_session.execute(
+            select(User).where(User.username == f"test_user_{i}")
+        )
         user = result.scalar_one_or_none()
 
         if not user:
@@ -71,15 +73,21 @@ async def test_users(db_session: AsyncSession) -> list[User]:
             await db_session.refresh(user)
 
     # Get all test users
-    result = await db_session.execute(select(User).where(User.username.like("test_user_%")))
+    result = await db_session.execute(
+        select(User).where(User.username.like("test_user_%"))
+    )
     return list(result.scalars().all())
 
 
 @pytest.fixture
-async def test_user_with_content(db_session: AsyncSession) -> tuple[User, list[Post], list[Comment]]:
+async def test_user_with_content(
+    db_session: AsyncSession,
+) -> tuple[User, list[Post], list[Comment]]:
     """Create a test user with associated posts and comments."""
     # Check if user already exists
-    result = await db_session.execute(select(User).where(User.username == "content_user"))
+    result = await db_session.execute(
+        select(User).where(User.username == "content_user")
+    )
     user = result.scalar_one_or_none()
 
     if not user:
@@ -97,7 +105,9 @@ async def test_user_with_content(db_session: AsyncSession) -> tuple[User, list[P
     # Create posts for the user
     posts = []
     for i in range(2):
-        result = await db_session.execute(select(Post).where(Post.title == f"Test Post {i}"))
+        result = await db_session.execute(
+            select(Post).where(Post.title == f"Test Post {i}")
+        )
         post = result.scalar_one_or_none()
 
         if not post:
@@ -114,7 +124,9 @@ async def test_user_with_content(db_session: AsyncSession) -> tuple[User, list[P
     comments = []
     if posts:
         for i in range(2):
-            result = await db_session.execute(select(Comment).where(Comment.content == f"Test Comment {i}"))
+            result = await db_session.execute(
+                select(Comment).where(Comment.content == f"Test Comment {i}")
+            )
             comment = result.scalar_one_or_none()
 
             if not comment:
@@ -144,7 +156,7 @@ def test_create_user_success():
     user_data = {
         "username": "newuser",
         "email": "newuser@example.com",
-        "hashed_password": "newhashedpassword"
+        "hashed_password": "newhashedpassword",
     }
 
     response = client.post("/api/v1/users/", json=user_data)
@@ -163,7 +175,7 @@ def test_create_user_duplicate_email(test_user: User):
     user_data = {
         "username": "anotheruser",
         "email": test_user.email,  # Duplicate email
-        "hashed_password": "anotherhashedpassword"
+        "hashed_password": "anotherhashedpassword",
     }
 
     response = client.post("/api/v1/users/", json=user_data)
@@ -176,7 +188,7 @@ def test_create_user_invalid_data():
     user_data = {
         "username": "",  # Invalid empty username
         "email": "invalid-email",  # Invalid email format
-        "hashed_password": "password"
+        "hashed_password": "password",
     }
 
     response = client.post("/api/v1/users/", json=user_data)
@@ -241,9 +253,7 @@ def test_read_user_by_id_not_found():
 # Integration tests for PATCH /users/{user_id} - Update a user
 def test_update_user_success(test_user: User):
     """Test successful user update."""
-    update_data = {
-        "username": "updated_username"
-    }
+    update_data = {"username": "updated_username"}
 
     response = client.patch(f"/api/v1/users/{test_user.id}", json=update_data)
     assert response.status_code == 200
@@ -256,9 +266,7 @@ def test_update_user_success(test_user: User):
 def test_update_user_not_found():
     """Test update of a non-existent user."""
     fake_user_id = uuid.uuid4()
-    update_data = {
-        "username": "updated_username"
-    }
+    update_data = {"username": "updated_username"}
 
     response = client.patch(f"/api/v1/users/{fake_user_id}", json=update_data)
     assert response.status_code == 404
@@ -296,7 +304,9 @@ def test_delete_user_not_found():
 
 
 # Integration tests for GET /users/{user_id}/posts - Get all posts by a specific user
-def test_get_user_posts_success(test_user_with_content: tuple[User, list[Post], list[Comment]]):
+def test_get_user_posts_success(
+    test_user_with_content: tuple[User, list[Post], list[Comment]],
+):
     """Test successful retrieval of posts by user."""
     user, posts, _ = test_user_with_content
 
@@ -337,8 +347,11 @@ def test_get_user_posts_user_not_found():
     assert len(data) == 0
 
 
-# Integration tests for GET /users/{user_id}/comments - Get all comments by a specific user
-def test_get_user_comments_success(test_user_with_content: tuple[User, list[Post], list[Comment]]):
+# Integration tests for GET /users/{user_id}/comments -
+# Get all comments by a specific user
+def test_get_user_comments_success(
+    test_user_with_content: tuple[User, list[Post], list[Comment]],
+):
     """Test successful retrieval of comments by user."""
     user, _, comments = test_user_with_content
 

@@ -1,17 +1,18 @@
 import uuid
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.db.session import get_session
 from app.models.post import Post
 from app.models.post_tag import PostTag
 
 
-async def create_post(db: AsyncSession, post: Post) -> Post:
+async def create_post(post: Post, db: AsyncSession = Depends(get_session)) -> Post:
     """
     Create a new post in the database.
 
@@ -28,7 +29,9 @@ async def create_post(db: AsyncSession, post: Post) -> Post:
     return post
 
 
-async def get_post_by_id(db: AsyncSession, post_id: uuid.UUID) -> Post | None:
+async def get_post_by_id(
+    post_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> Post | None:
     """
     Get a post by its ID.
 
@@ -78,7 +81,9 @@ async def get_all_posts(db: AsyncSession) -> list[Post]:
     return result.scalars().all()
 
 
-async def get_posts_by_author(db: AsyncSession, author_id: uuid.UUID) -> list[Post]:
+async def get_posts_by_author(
+    author_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> list[Post]:
     """
     Get all posts by a specific author.
 
@@ -105,7 +110,11 @@ async def get_posts_by_author(db: AsyncSession, author_id: uuid.UUID) -> list[Po
 
 
 async def search_posts(
-    db: AsyncSession, *, query: str, skip: int = 0, limit: int = 100
+    *,
+    query: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_session),
 ) -> tuple[list[Post], int]:
     """
     Search posts by query string (title or content).
@@ -113,12 +122,7 @@ async def search_posts(
     # Create the search query
     search_query = (
         select(Post)
-        .where(
-            or_(
-                Post.title.ilike(f"%{query}%"),
-                Post.content.ilike(f"%{query}%")
-            )
-        )
+        .where(or_(Post.title.ilike(f"%{query}%"), Post.content.ilike(f"%{query}%")))
         .options(
             selectinload(Post.author),
             selectinload(Post.category),
@@ -142,7 +146,7 @@ async def search_posts(
 
 
 async def update_post(
-    db: AsyncSession, post_id: uuid.UUID, updated_post: Post
+    post_id: uuid.UUID, updated_post: Post, db: AsyncSession = Depends(get_session)
 ) -> Post | None:
     """
     Update a post by its ID.
@@ -177,7 +181,9 @@ async def update_post(
     return post
 
 
-async def delete_post(db: AsyncSession, post_id: uuid.UUID) -> bool:
+async def delete_post(
+    post_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> bool:
     """
     Delete a post by its ID.
 
@@ -208,7 +214,9 @@ async def delete_post(db: AsyncSession, post_id: uuid.UUID) -> bool:
     return True
 
 
-async def get_posts_by_category(db: AsyncSession, category_id: UUID) -> list[Post]:
+async def get_posts_by_category(
+    category_id: UUID, db: AsyncSession = Depends(get_session)
+) -> list[Post]:
     """
     Get all posts in a specific category.
 
@@ -234,7 +242,9 @@ async def get_posts_by_category(db: AsyncSession, category_id: UUID) -> list[Pos
     return result.scalars().all()
 
 
-async def get_posts_by_tag(db: AsyncSession, tag_id: UUID) -> list[Post]:
+async def get_posts_by_tag(
+    tag_id: UUID, db: AsyncSession = Depends(get_session)
+) -> list[Post]:
     """
     Get all posts with a specific tag.
 

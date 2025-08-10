@@ -84,8 +84,8 @@ async def read_role_by_id(
     try:
         role = await get_role_by_id(role_id)
         return role
-    except HTTPException:
-        raise HTTPException(status_code=404, detail="Role not found")
+    except HTTPException as e:
+        raise HTTPException(status_code=404, detail="Role not found") from e
 
 
 @router.put("/{role_id}", response_model=RoleRead)
@@ -115,12 +115,12 @@ async def update_existing_role(
 
     # Check if role exists
     try:
-        existing_role = await get_role_by_id(role_id)
+        await get_role_by_id(role_id)
     except HTTPException:
         raise HTTPException(
             status_code=404,
             detail="The role with this id does not exist in the system",
-        )
+        ) from HTTPException
 
     # Check if updated name conflicts with existing roles
     if role_data.get("name"):
@@ -138,11 +138,16 @@ async def update_existing_role(
     try:
         updated_role = await update_role(role_id, role_data)
         return updated_role
-    except Exception:
+    except ValueError as e:
         raise HTTPException(
             status_code=400,
-            detail="Error updating role",
-        )
+            detail=f"Error updating role: {str(e)}",
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error while updating role",
+        ) from e
 
 
 @router.delete("/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -162,9 +167,9 @@ async def delete_role_by_id(
         None: Returns no content on successful deletion.
     """
     try:
-        role = await get_role_by_id(role_id)
+        await get_role_by_id(role_id)
     except HTTPException:
-        raise HTTPException(status_code=404, detail="Role not found")
+        raise HTTPException(status_code=404, detail="Role not found") from HTTPException
 
     await delete_role(role_id)
     return None

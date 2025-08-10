@@ -52,7 +52,9 @@ async def test_search_posts_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the post CRUD function
-    with patch("app.api.v1.endpoints.search.post_crud.search_posts") as mock_search_posts:
+    with patch(
+        "app.api.v1.endpoints.search.post_crud.search_posts"
+    ) as mock_search_posts:
         mock_search_posts.return_value = (mock_posts, mock_total)
 
         # Call the endpoint
@@ -62,7 +64,9 @@ async def test_search_posts_success():
         assert isinstance(result, PostSearchResult)
         assert len(result.posts) == 2
         assert result.total == 2
-        mock_search_posts.assert_called_once_with(mock_db, query="test", skip=0, limit=100)
+        mock_search_posts.assert_called_once_with(
+            mock_db, query="test", skip=0, limit=100
+        )
 
 
 @pytest.mark.asyncio
@@ -76,7 +80,9 @@ async def test_search_posts_empty_results():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the post CRUD function
-    with patch("app.api.v1.endpoints.search.post_crud.search_posts") as mock_search_posts:
+    with patch(
+        "app.api.v1.endpoints.search.post_crud.search_posts"
+    ) as mock_search_posts:
         mock_search_posts.return_value = (mock_posts, mock_total)
 
         # Call the endpoint
@@ -115,7 +121,9 @@ async def test_search_users_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the user CRUD function
-    with patch("app.api.v1.endpoints.search.user_crud.search_users") as mock_search_users:
+    with patch(
+        "app.api.v1.endpoints.search.user_crud.search_users"
+    ) as mock_search_users:
         mock_search_users.return_value = (mock_users, mock_total)
 
         # Call the endpoint
@@ -125,7 +133,9 @@ async def test_search_users_success():
         assert isinstance(result, UserSearchResult)
         assert len(result.users) == 2
         assert result.total == 2
-        mock_search_users.assert_called_once_with(mock_db, query="test", skip=0, limit=100)
+        mock_search_users.assert_called_once_with(
+            mock_db, query="test", skip=0, limit=100
+        )
 
 
 @pytest.mark.asyncio
@@ -139,7 +149,9 @@ async def test_search_users_empty_results():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the user CRUD function
-    with patch("app.api.v1.endpoints.search.user_crud.search_users") as mock_search_users:
+    with patch(
+        "app.api.v1.endpoints.search.user_crud.search_users"
+    ) as mock_search_users:
         mock_search_users.return_value = (mock_users, mock_total)
 
         # Call the endpoint
@@ -210,7 +222,9 @@ async def test_search_categories_empty_results():
         mock_search_categories.return_value = (mock_categories, mock_total)
 
         # Call the endpoint
-        result = await search_categories(query="nonexistent", skip=0, limit=100, db=mock_db)
+        result = await search_categories(
+            query="nonexistent", skip=0, limit=100, db=mock_db
+        )
 
         # Assertions
         assert isinstance(result, CategorySearchResult)
@@ -253,7 +267,9 @@ async def test_search_tags_success():
         assert isinstance(result, TagSearchResult)
         assert len(result.tags) == 2
         assert result.total == 2
-        mock_search_tags.assert_called_once_with(mock_db, query="test", skip=0, limit=100)
+        mock_search_tags.assert_called_once_with(
+            mock_db, query="test", skip=0, limit=100
+        )
 
 
 @pytest.mark.asyncio

@@ -81,8 +81,12 @@ async def test_create_new_post_db_error():
         mock_create_post.side_effect = Exception("Database error")
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await create_new_post(post_in=post_data, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while creating post"
 
 
 @pytest.mark.asyncio
@@ -97,8 +101,12 @@ async def test_create_new_post_invalid_data():
     mock_db = AsyncMock()
 
     # Verify that the exception is raised due to validation error
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPException) as exc_info:
         await create_new_post(post_in=post_data, db=mock_db)
+
+    # Assertions
+    assert exc_info.value.status_code == 500
+    assert exc_info.value.detail == "Internal server error while creating post"
 
 
 @pytest.mark.asyncio
@@ -135,7 +143,9 @@ async def test_update_existing_post_success():
         mock_db.refresh = AsyncMock()
 
         # Call the endpoint
-        result = await update_existing_post(post_id=post_id, post_in=update_data, db=mock_db)
+        result = await update_existing_post(
+            post_id=post_id, post_in=update_data, db=mock_db
+        )
 
         # Assertions
         assert isinstance(result, Post)
@@ -174,7 +184,10 @@ async def test_update_existing_post_not_found():
 
         # Assertions
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
-        assert exc_info.value.detail == "The post with this id does not exist in the system"
+        assert (
+            exc_info.value.detail
+            == "The post with this id does not exist in the system"
+        )
 
 
 @pytest.mark.asyncio
@@ -210,7 +223,9 @@ async def test_update_existing_post_invalid_data():
         mock_db.refresh = AsyncMock()
 
         # Call the endpoint
-        result = await update_existing_post(post_id=post_id, post_in=update_data, db=mock_db)
+        result = await update_existing_post(
+            post_id=post_id, post_in=update_data, db=mock_db
+        )
 
         # Assertions - post should remain unchanged since no update data was provided
         assert isinstance(result, Post)
@@ -253,8 +268,12 @@ async def test_update_existing_post_db_error():
         mock_db.refresh = AsyncMock()
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await update_existing_post(post_id=post_id, post_in=update_data, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while updating post"
 
 
 @pytest.mark.asyncio
@@ -349,8 +368,12 @@ async def test_delete_post_by_id_db_error():
         mock_db.commit = AsyncMock(side_effect=Exception("Database error"))
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await delete_post_by_id(post_id=post_id, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while deleting post"
 
 
 @pytest.mark.asyncio
@@ -428,8 +451,12 @@ async def test_read_draft_posts_db_error():
     mock_db.execute.side_effect = Exception("Database error")
 
     # Verify that the exception is raised
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPException) as exc_info:
         await read_draft_posts(db=mock_db)
+
+    # Assertions
+    assert exc_info.value.status_code == 500
+    assert exc_info.value.detail == "Internal server error while fetching draft posts"
 
 
 @pytest.mark.asyncio
@@ -509,8 +536,14 @@ async def test_read_published_posts_db_error():
     mock_db.execute.side_effect = Exception("Database error")
 
     # Verify that the exception is raised
-    with pytest.raises(Exception):
+    with pytest.raises(HTTPException) as exc_info:
         await read_published_posts(db=mock_db)
+
+    # Assertions
+    assert exc_info.value.status_code == 500
+    assert (
+        exc_info.value.detail == "Internal server error while fetching published posts"
+    )
 
 
 @pytest.mark.asyncio
@@ -577,7 +610,10 @@ async def test_publish_post_not_found():
 
         # Assertions
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
-        assert exc_info.value.detail == "The post with this id does not exist in the system"
+        assert (
+            exc_info.value.detail
+            == "The post with this id does not exist in the system"
+        )
 
 
 @pytest.mark.asyncio
@@ -644,8 +680,12 @@ async def test_publish_post_db_error():
         mock_db.refresh = AsyncMock()
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await publish_post(post_id=post_id, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while publishing post"
 
 
 @pytest.mark.asyncio
@@ -713,7 +753,10 @@ async def test_unpublish_post_not_found():
 
         # Assertions
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
-        assert exc_info.value.detail == "The post with this id does not exist in the system"
+        assert (
+            exc_info.value.detail
+            == "The post with this id does not exist in the system"
+        )
 
 
 @pytest.mark.asyncio
@@ -780,5 +823,9 @@ async def test_unpublish_post_db_error():
         mock_db.refresh = AsyncMock()
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await unpublish_post(post_id=post_id, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while unpublishing post"

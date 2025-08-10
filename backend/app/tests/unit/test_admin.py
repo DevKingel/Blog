@@ -61,8 +61,14 @@ async def test_get_admin_statistics_db_error():
         mock_get_stats.side_effect = Exception("Database error")
 
         # Verify that the exception is raised
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await get_admin_statistics(db=mock_db, current_admin=mock_admin_user)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert (
+            exc_info.value.detail == "Internal server error while fetching statistics"
+        )
 
 
 @pytest.mark.asyncio
@@ -83,7 +89,9 @@ async def test_list_all_users_success():
         mock_get_users.return_value = mock_users
 
         # Call the endpoint
-        result = await list_all_users(skip=0, limit=100, db=mock_db, current_admin=mock_admin_user)
+        result = await list_all_users(
+            skip=0, limit=100, db=mock_db, current_admin=mock_admin_user
+        )
 
         # Assertions
         assert isinstance(result, UserListRead)
@@ -112,7 +120,9 @@ async def test_list_all_users_with_pagination():
         mock_get_users.return_value = mock_users
 
         # Call the endpoint with custom pagination
-        result = await list_all_users(skip=10, limit=5, db=mock_db, current_admin=mock_admin_user)
+        result = await list_all_users(
+            skip=10, limit=5, db=mock_db, current_admin=mock_admin_user
+        )
 
         # Assertions
         assert isinstance(result, UserListRead)
@@ -168,7 +178,9 @@ async def test_delete_any_user_success():
         mock_delete_user.return_value = True
 
         # Call the endpoint
-        result = await delete_any_user(user_id=user_id, db=mock_db, current_admin=mock_admin_user)
+        result = await delete_any_user(
+            user_id=user_id, db=mock_db, current_admin=mock_admin_user
+        )
 
         # Assertions
         assert result is None
@@ -192,7 +204,9 @@ async def test_delete_any_user_not_found():
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await delete_any_user(user_id=user_id, db=mock_db, current_admin=mock_admin_user)
+            await delete_any_user(
+                user_id=user_id, db=mock_db, current_admin=mock_admin_user
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404
@@ -222,7 +236,9 @@ async def test_delete_any_user_db_error():
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await delete_any_user(user_id=user_id, db=mock_db, current_admin=mock_admin_user)
+            await delete_any_user(
+                user_id=user_id, db=mock_db, current_admin=mock_admin_user
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404
@@ -248,7 +264,9 @@ async def test_delete_any_user_self_deletion_forbidden():
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await delete_any_user(user_id=user_id, db=mock_db, current_admin=mock_admin_user)
+            await delete_any_user(
+                user_id=user_id, db=mock_db, current_admin=mock_admin_user
+            )
 
         # Assertions
         assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
@@ -274,7 +292,9 @@ async def test_list_all_posts_success():
     mock_db.execute.return_value = mock_result
 
     # Call the endpoint
-    result = await list_all_posts(skip=0, limit=100, db=mock_db, current_admin=mock_admin_user)
+    result = await list_all_posts(
+        skip=0, limit=100, db=mock_db, current_admin=mock_admin_user
+    )
 
     # Assertions
     assert isinstance(result, PostListRead)
@@ -304,7 +324,9 @@ async def test_list_all_posts_with_pagination():
     mock_db.execute.return_value = mock_result
 
     # Call the endpoint with custom pagination
-    result = await list_all_posts(skip=10, limit=5, db=mock_db, current_admin=mock_admin_user)
+    result = await list_all_posts(
+        skip=10, limit=5, db=mock_db, current_admin=mock_admin_user
+    )
 
     # Assertions
     assert isinstance(result, PostListRead)
@@ -360,7 +382,9 @@ async def test_delete_any_post_success():
         mock_delete_post.return_value = True
 
         # Call the endpoint
-        result = await delete_any_post(post_id=post_id, db=mock_db, current_admin=mock_admin_user)
+        result = await delete_any_post(
+            post_id=post_id, db=mock_db, current_admin=mock_admin_user
+        )
 
         # Assertions
         assert result is None
@@ -384,7 +408,9 @@ async def test_delete_any_post_not_found():
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await delete_any_post(post_id=post_id, db=mock_db, current_admin=mock_admin_user)
+            await delete_any_post(
+                post_id=post_id, db=mock_db, current_admin=mock_admin_user
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404
@@ -413,7 +439,9 @@ async def test_delete_any_post_db_error():
 
         # Verify that the exception is raised
         with pytest.raises(HTTPException) as exc_info:
-            await delete_any_post(post_id=post_id, db=mock_db, current_admin=mock_admin_user)
+            await delete_any_post(
+                post_id=post_id, db=mock_db, current_admin=mock_admin_user
+            )
 
         # Assertions
         assert exc_info.value.status_code == 404

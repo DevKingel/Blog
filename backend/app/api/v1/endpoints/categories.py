@@ -116,7 +116,9 @@ async def update_existing_category(
         )
 
     # Check if category exists
-    existing_category = await category_crud.get_category_by_id(db, category_id=str(category_id))
+    existing_category = await category_crud.get_category_by_id(
+        db, category_id=str(category_id)
+    )
     if not existing_category:
         raise HTTPException(
             status_code=404,
@@ -171,7 +173,7 @@ async def delete_category_by_id(
     category = await category_crud.get_category_by_id(db, category_id=str(category_id))
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    success = await category_crud.delete_category(db, category_id=str(category_id))
+    await category_crud.delete_category(db, category_id=str(category_id))
     return None
 
 

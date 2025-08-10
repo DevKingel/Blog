@@ -26,18 +26,17 @@ def create_test_token(user_id: uuid.UUID) -> str:
 @pytest.fixture
 def test_user():
     """Create a test user using a sync fixture."""
+
     # For integration tests, we'll create a simple user object
     # In real tests, the database would be used to create the actual user
     class MockUser:
-        def __init__(self, id, username, email):
-            self.id = id
+        def __init__(self, user_id, username, email):
+            self.user_id = user_id
             self.username = username
             self.email = email
 
     return MockUser(
-        id=uuid.uuid4(),
-        username="test_user",
-        email="test@example.com"
+        user_id=uuid.uuid4(), username="test_user", email="test@example.com"
     )
 
 
@@ -94,15 +93,11 @@ def test_update_current_user_profile_user_not_found():
     headers = {"Authorization": f"Bearer {token}"}
 
     # Update profile data
-    update_data = {
-        "username": "updated_user"
-    }
+    update_data = {"username": "updated_user"}
 
     # Try to update profile for non-existent user
     response = client.put(
-        f"/api/v1/profile/?user_id={fake_user_id}",
-        json=update_data,
-        headers=headers
+        f"/api/v1/profile/?user_id={fake_user_id}", json=update_data, headers=headers
     )
 
     # Should be 404 Not Found
@@ -125,9 +120,7 @@ def test_update_current_user_profile_invalid_data():
 
     # Try to update profile with invalid data
     response = client.put(
-        f"/api/v1/profile/?user_id={fake_user_id}",
-        json=update_data,
-        headers=headers
+        f"/api/v1/profile/?user_id={fake_user_id}", json=update_data, headers=headers
     )
 
     # Should be 422 Unprocessable Entity (validation error)
@@ -139,15 +132,10 @@ def test_update_current_user_profile_unauthorized():
     fake_user_id = uuid.uuid4()
 
     # Update profile data
-    update_data = {
-        "username": "updated_user"
-    }
+    update_data = {"username": "updated_user"}
 
     # Try to update profile without authentication
-    response = client.put(
-        f"/api/v1/profile/?user_id={fake_user_id}",
-        json=update_data
-    )
+    response = client.put(f"/api/v1/profile/?user_id={fake_user_id}", json=update_data)
 
     # Should be 401 Unauthorized (due to APIKeyMiddleware)
     assert response.status_code == 401

@@ -45,7 +45,9 @@ async def admin_user(db_session: AsyncSession) -> User:
     admin_role = result.scalar_one_or_none()
 
     if not admin_role:
-        admin_role = Role(id=uuid.uuid4(), name="admin", description="Administrator role")
+        admin_role = Role(
+            id=uuid.uuid4(), name="admin", description="Administrator role"
+        )
         db_session.add(admin_role)
         await db_session.commit()
         await db_session.refresh(admin_role)
@@ -80,7 +82,9 @@ async def admin_user(db_session: AsyncSession) -> User:
 async def regular_user(db_session: AsyncSession) -> User:
     """Create a test regular user."""
     # Check if regular user already exists
-    result = await db_session.execute(select(User).where(User.username == "regular_user"))
+    result = await db_session.execute(
+        select(User).where(User.username == "regular_user")
+    )
     regular_user = result.scalar_one_or_none()
 
     if not regular_user:
@@ -106,7 +110,9 @@ async def test_categories(db_session: AsyncSession) -> list[Category]:
     categories = []
     for i in range(3):
         # Check if category already exists
-        result = await db_session.execute(select(Category).where(Category.name == f"Category {i}"))
+        result = await db_session.execute(
+            select(Category).where(Category.name == f"Category {i}")
+        )
         category = result.scalar_one_or_none()
 
         if not category:
@@ -125,12 +131,16 @@ async def test_categories(db_session: AsyncSession) -> list[Category]:
             await db_session.refresh(category)
 
     # Get all test categories
-    result = await db_session.execute(select(Category).where(Category.name.like("Category %")))
+    result = await db_session.execute(
+        select(Category).where(Category.name.like("Category %"))
+    )
     return list(result.scalars().all())
 
 
 @pytest.fixture
-async def test_posts(db_session: AsyncSession, test_categories: list[Category]) -> list[Post]:
+async def test_posts(
+    db_session: AsyncSession, test_categories: list[Category]
+) -> list[Post]:
     """Create multiple test posts."""
     if not test_categories:
         return []
@@ -140,7 +150,9 @@ async def test_posts(db_session: AsyncSession, test_categories: list[Category]) 
 
     for i in range(3):
         # Check if post already exists
-        result = await db_session.execute(select(Post).where(Post.title == f"Test Post {i}"))
+        result = await db_session.execute(
+            select(Post).where(Post.title == f"Test Post {i}")
+        )
         post = result.scalar_one_or_none()
 
         if not post:
@@ -160,7 +172,9 @@ async def test_posts(db_session: AsyncSession, test_categories: list[Category]) 
             await db_session.refresh(post)
 
     # Get all test posts
-    result = await db_session.execute(select(Post).where(Post.title.like("Test Post %")))
+    result = await db_session.execute(
+        select(Post).where(Post.title.like("Test Post %"))
+    )
     return list(result.scalars().all())
 
 
@@ -172,10 +186,7 @@ def test_create_category_success(admin_user: User):
     headers = {"Authorization": f"Bearer {token}"}
 
     # Test data
-    category_data = {
-        "name": "Technology",
-        "slug": "technology"
-    }
+    category_data = {"name": "Technology", "slug": "technology"}
 
     response = client.post("/api/v1/categories/", json=category_data, headers=headers)
     assert response.status_code == 201
@@ -187,7 +198,9 @@ def test_create_category_success(admin_user: User):
     assert data["slug"] == "technology"
 
 
-def test_create_category_duplicate_name(admin_user: User, test_categories: list[Category]):
+def test_create_category_duplicate_name(
+    admin_user: User, test_categories: list[Category]
+):
     """Test creation of a category with duplicate name."""
     if not test_categories:
         pytest.skip("No test categories available")
@@ -199,14 +212,16 @@ def test_create_category_duplicate_name(admin_user: User, test_categories: list[
     # Try to create a category with the same name as an existing one
     category_data = {
         "name": test_categories[0].name,  # Duplicate name
-        "slug": "new-slug"
+        "slug": "new-slug",
     }
 
     response = client.post("/api/v1/categories/", json=category_data, headers=headers)
     assert response.status_code == 400
 
 
-def test_create_category_duplicate_slug(admin_user: User, test_categories: list[Category]):
+def test_create_category_duplicate_slug(
+    admin_user: User, test_categories: list[Category]
+):
     """Test creation of a category with duplicate slug."""
     if not test_categories:
         pytest.skip("No test categories available")
@@ -218,7 +233,7 @@ def test_create_category_duplicate_slug(admin_user: User, test_categories: list[
     # Try to create a category with the same slug as an existing one
     category_data = {
         "name": "New Category",
-        "slug": test_categories[0].slug  # Duplicate slug
+        "slug": test_categories[0].slug,  # Duplicate slug
     }
 
     response = client.post("/api/v1/categories/", json=category_data, headers=headers)
@@ -234,7 +249,7 @@ def test_create_category_invalid_data(admin_user: User):
     # Test with missing required fields
     category_data = {
         "name": "",  # Empty name
-        "slug": "tech"
+        "slug": "tech",
     }
 
     response = client.post("/api/v1/categories/", json=category_data, headers=headers)
@@ -243,10 +258,7 @@ def test_create_category_invalid_data(admin_user: User):
 
 def test_create_category_unauthorized():
     """Test that unauthenticated requests are rejected."""
-    category_data = {
-        "name": "Technology",
-        "slug": "technology"
-    }
+    category_data = {"name": "Technology", "slug": "technology"}
 
     response = client.post("/api/v1/categories/", json=category_data)
     assert response.status_code == 401
@@ -331,11 +343,11 @@ def test_update_category_success(admin_user: User, test_categories: list[Categor
     headers = {"Authorization": f"Bearer {token}"}
 
     category = test_categories[0]
-    update_data = {
-        "name": "Updated Category Name"
-    }
+    update_data = {"name": "Updated Category Name"}
 
-    response = client.patch(f"/api/v1/categories/{category.id}", json=update_data, headers=headers)
+    response = client.patch(
+        f"/api/v1/categories/{category.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 200
 
     # Verify response structure
@@ -351,15 +363,17 @@ def test_update_category_not_found(admin_user: User):
     headers = {"Authorization": f"Bearer {token}"}
 
     fake_category_id = uuid.uuid4()
-    update_data = {
-        "name": "Updated Category Name"
-    }
+    update_data = {"name": "Updated Category Name"}
 
-    response = client.patch(f"/api/v1/categories/{fake_category_id}", json=update_data, headers=headers)
+    response = client.patch(
+        f"/api/v1/categories/{fake_category_id}", json=update_data, headers=headers
+    )
     assert response.status_code == 404
 
 
-def test_update_category_duplicate_name(admin_user: User, test_categories: list[Category]):
+def test_update_category_duplicate_name(
+    admin_user: User, test_categories: list[Category]
+):
     """Test update of a category with a name that already exists."""
     if len(test_categories) < 2:
         pytest.skip("Not enough test categories available")
@@ -376,11 +390,15 @@ def test_update_category_duplicate_name(admin_user: User, test_categories: list[
         "name": category2.name  # Duplicate name
     }
 
-    response = client.patch(f"/api/v1/categories/{category1.id}", json=update_data, headers=headers)
+    response = client.patch(
+        f"/api/v1/categories/{category1.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 400
 
 
-def test_update_category_duplicate_slug(admin_user: User, test_categories: list[Category]):
+def test_update_category_duplicate_slug(
+    admin_user: User, test_categories: list[Category]
+):
     """Test update of a category with a slug that already exists."""
     if len(test_categories) < 2:
         pytest.skip("Not enough test categories available")
@@ -397,7 +415,9 @@ def test_update_category_duplicate_slug(admin_user: User, test_categories: list[
         "slug": category2.slug  # Duplicate slug
     }
 
-    response = client.patch(f"/api/v1/categories/{category1.id}", json=update_data, headers=headers)
+    response = client.patch(
+        f"/api/v1/categories/{category1.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 400
 
 
@@ -413,11 +433,15 @@ def test_update_category_no_data(admin_user: User, test_categories: list[Categor
     category = test_categories[0]
     update_data = {}  # Empty data
 
-    response = client.patch(f"/api/v1/categories/{category.id}", json=update_data, headers=headers)
+    response = client.patch(
+        f"/api/v1/categories/{category.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 400
 
 
-def test_update_category_invalid_data(admin_user: User, test_categories: list[Category]):
+def test_update_category_invalid_data(
+    admin_user: User, test_categories: list[Category]
+):
     """Test update of a category with invalid data."""
     if not test_categories:
         pytest.skip("No test categories available")
@@ -431,7 +455,9 @@ def test_update_category_invalid_data(admin_user: User, test_categories: list[Ca
         "name": ""  # Empty name
     }
 
-    response = client.patch(f"/api/v1/categories/{category.id}", json=update_data, headers=headers)
+    response = client.patch(
+        f"/api/v1/categories/{category.id}", json=update_data, headers=headers
+    )
     assert response.status_code == 422
 
 
@@ -441,9 +467,7 @@ def test_update_category_unauthorized(test_categories: list[Category]):
         pytest.skip("No test categories available")
 
     category = test_categories[0]
-    update_data = {
-        "name": "Updated Category Name"
-    }
+    update_data = {"name": "Updated Category Name"}
 
     response = client.patch(f"/api/v1/categories/{category.id}", json=update_data)
     assert response.status_code == 401
@@ -486,7 +510,9 @@ def test_delete_category_unauthorized(test_categories: list[Category]):
 
 
 # Integration tests for GET /categories/{category_id}/posts
-def test_get_category_posts_success(test_categories: list[Category], test_posts: list[Post]):
+def test_get_category_posts_success(
+    test_categories: list[Category], test_posts: list[Post]
+):
     """Test successful retrieval of posts in a category."""
     if not test_categories or not test_posts:
         pytest.skip("No test categories or posts available")

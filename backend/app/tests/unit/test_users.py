@@ -24,9 +24,7 @@ async def test_create_user_success():
     """Test successful user creation."""
     # Mock data
     user_data = UserCreate(
-        username="testuser",
-        email="test@example.com",
-        hashed_password="hashed_password"
+        username="testuser", email="test@example.com", hashed_password="hashed_password"
     )
 
     mock_user = User(
@@ -34,7 +32,7 @@ async def test_create_user_success():
         username="testuser",
         email="test@example.com",
         hashed_password="hashed_password",
-        created_at="2023-01-01T00:00:00"
+        created_at="2023-01-01T00:00:00",
     )
 
     # Mock dependencies
@@ -42,7 +40,9 @@ async def test_create_user_success():
 
     # Mock the user CRUD functions
     with (
-        patch("app.api.v1.endpoints.users.user_crud.get_user_by_email") as mock_get_by_email,
+        patch(
+            "app.api.v1.endpoints.users.user_crud.get_user_by_email"
+        ) as mock_get_by_email,
         patch("app.api.v1.endpoints.users.user_crud.create_user") as mock_create_user,
     ):
         mock_get_by_email.return_value = None  # No existing user
@@ -63,9 +63,7 @@ async def test_create_user_duplicate_email():
     """Test user creation with duplicate email."""
     # Mock data
     user_data = UserCreate(
-        username="testuser",
-        email="test@example.com",
-        hashed_password="hashed_password"
+        username="testuser", email="test@example.com", hashed_password="hashed_password"
     )
 
     existing_user = User(
@@ -73,14 +71,16 @@ async def test_create_user_duplicate_email():
         username="existinguser",
         email="test@example.com",
         hashed_password="hashed_password",
-        created_at="2023-01-01T00:00:00"
+        created_at="2023-01-01T00:00:00",
     )
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the user CRUD function
-    with patch("app.api.v1.endpoints.users.user_crud.get_user_by_email") as mock_get_by_email:
+    with patch(
+        "app.api.v1.endpoints.users.user_crud.get_user_by_email"
+    ) as mock_get_by_email:
         mock_get_by_email.return_value = existing_user
 
         # Call the endpoint and expect HTTPException
@@ -100,7 +100,7 @@ async def test_create_user_invalid_data():
     user_data = UserCreate(
         username="testuser",
         email="invalid-email",  # Invalid email format
-        hashed_password="hashed_password"
+        hashed_password="hashed_password",
     )
 
     # Mock dependencies
@@ -110,15 +110,21 @@ async def test_create_user_invalid_data():
     # For unit testing, we'll test the function directly with valid data
     # but mock the database to raise an exception
     with (
-        patch("app.api.v1.endpoints.users.user_crud.get_user_by_email") as mock_get_by_email,
+        patch(
+            "app.api.v1.endpoints.users.user_crud.get_user_by_email"
+        ) as mock_get_by_email,
         patch("app.api.v1.endpoints.users.user_crud.create_user") as mock_create_user,
     ):
         mock_get_by_email.return_value = None
         mock_create_user.side_effect = Exception("Validation error")
 
         # Call the endpoint and expect exception
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await create_new_user(user_in=user_data, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while creating user"
 
 
 @pytest.mark.asyncio
@@ -126,8 +132,18 @@ async def test_read_users_success():
     """Test successful retrieval of users with pagination."""
     # Mock data
     mock_users = [
-        User(id=uuid.uuid4(), username="user1", email="user1@example.com", hashed_password="pass1"),
-        User(id=uuid.uuid4(), username="user2", email="user2@example.com", hashed_password="pass2"),
+        User(
+            id=uuid.uuid4(),
+            username="user1",
+            email="user1@example.com",
+            hashed_password="pass1",
+        ),
+        User(
+            id=uuid.uuid4(),
+            username="user2",
+            email="user2@example.com",
+            hashed_password="pass2",
+        ),
     ]
 
     # Mock dependencies
@@ -178,7 +194,7 @@ async def test_read_user_by_id_success():
         username="testuser",
         email="test@example.com",
         hashed_password="hashed_password",
-        created_at="2023-01-01T00:00:00"
+        created_at="2023-01-01T00:00:00",
     )
 
     # Mock dependencies
@@ -231,14 +247,14 @@ async def test_update_user_success():
         id=user_id,
         username="testuser",
         email="test@example.com",
-        hashed_password="hashed_password"
+        hashed_password="hashed_password",
     )
 
     updated_user = User(
         id=user_id,
         username="updateduser",
         email="test@example.com",
-        hashed_password="hashed_password"
+        hashed_password="hashed_password",
     )
 
     # Mock dependencies
@@ -253,7 +269,9 @@ async def test_update_user_success():
         mock_update_user.return_value = updated_user
 
         # Call the endpoint
-        result = await update_existing_user(user_id=user_id, user_in=update_data, db=mock_db)
+        result = await update_existing_user(
+            user_id=user_id, user_in=update_data, db=mock_db
+        )
 
         # Assertions
         assert result.username == "updateduser"
@@ -300,7 +318,7 @@ async def test_update_user_invalid_data():
         id=user_id,
         username="testuser",
         email="test@example.com",
-        hashed_password="hashed_password"
+        hashed_password="hashed_password",
     )
 
     # Mock dependencies
@@ -315,8 +333,12 @@ async def test_update_user_invalid_data():
         mock_update_user.side_effect = Exception("Validation error")
 
         # Call the endpoint and expect exception
-        with pytest.raises(Exception):
+        with pytest.raises(HTTPException) as exc_info:
             await update_existing_user(user_id=user_id, user_in=update_data, db=mock_db)
+
+        # Assertions
+        assert exc_info.value.status_code == 500
+        assert exc_info.value.detail == "Internal server error while updating user"
 
 
 @pytest.mark.asyncio
@@ -418,8 +440,12 @@ async def test_get_user_comments_success():
     # Mock data
     user_id = uuid.uuid4()
     mock_comments = [
-        Comment(id=uuid.uuid4(), content="Comment 1", user_id=user_id, post_id=uuid.uuid4()),
-        Comment(id=uuid.uuid4(), content="Comment 2", user_id=user_id, post_id=uuid.uuid4()),
+        Comment(
+            id=uuid.uuid4(), content="Comment 1", user_id=user_id, post_id=uuid.uuid4()
+        ),
+        Comment(
+            id=uuid.uuid4(), content="Comment 2", user_id=user_id, post_id=uuid.uuid4()
+        ),
     ]
 
     # Mock dependencies

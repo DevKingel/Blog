@@ -2,6 +2,8 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from app.api.dependencies.admin import get_admin_user
 from app.crud import post as post_crud
@@ -24,16 +26,22 @@ async def get_admin_statistics(
 ) -> AdminStatsRead:
     """
     Get detailed admin statistics.
-    
+
     Args:
         db: Database session
         current_admin: Current admin user (from dependency)
-        
+
     Returns:
         AdminStatsRead: Detailed admin statistics
     """
-    site_stats = await stat_crud.get_site_stats(db)
-    return AdminStatsRead(**site_stats)
+    try:
+        site_stats = await stat_crud.get_site_stats(db)
+        return AdminStatsRead(**site_stats)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error while fetching statistics",
+        ) from e
 
 
 @router.get("/users", response_model=UserListRead)
@@ -45,13 +53,13 @@ async def list_all_users(
 ) -> UserListRead:
     """
     List all users (admin only).
-    
+
     Args:
         skip: Number of users to skip
         limit: Maximum number of users to return
         db: Database session
         current_admin: Current admin user (from dependency)
-        
+
     Returns:
         UserListRead: List of users with pagination info
     """
@@ -62,7 +70,7 @@ async def list_all_users(
         users=[UserRead(**user.__dict__) for user in users],
         total=total_users,
         page=skip // limit + 1,
-        size=min(limit, total_users)
+        size=min(limit, total_users),
     )
 
 
@@ -74,12 +82,12 @@ async def delete_any_user(
 ) -> None:
     """
     Delete any user (admin only).
-    
+
     Args:
         user_id: ID of the user to delete
         db: Database session
         current_admin: Current admin user (from dependency)
-        
+
     Returns:
         None
     """
@@ -91,8 +99,7 @@ async def delete_any_user(
     # Prevent admin from deleting themselves
     if user.id == current_admin.id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You cannot delete yourself"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot delete yourself"
         )
 
     # Delete the user
@@ -112,27 +119,29 @@ async def list_all_posts(
 ) -> PostListRead:
     """
     List all posts (admin only).
-    
+
     Args:
         skip: Number of posts to skip
         limit: Maximum number of posts to return
         db: Database session
         current_admin: Current admin user (from dependency)
-        
+
     Returns:
         PostListRead: List of posts with pagination info
     """
-    # Get all posts with pagination
-    from sqlalchemy.future import select
-    from sqlalchemy.orm import selectinload
 
-    query = select(Post).options(
-        selectinload(Post.author),
-        selectinload(Post.category),
-        selectinload(Post.comments),
-        selectinload(Post.tags),
-        selectinload(Post.stat),
-    ).offset(skip).limit(limit)
+    query = (
+        select(Post)
+        .options(
+            selectinload(Post.author),
+            selectinload(Post.category),
+            selectinload(Post.comments),
+            selectinload(Post.tags),
+            selectinload(Post.stat),
+        )
+        .offset(skip)
+        .limit(limit)
+    )
 
     result = await db.execute(query)
     posts = result.scalars().all()
@@ -142,7 +151,7 @@ async def list_all_posts(
         posts=[PostRead(**post.__dict__) for post in posts],
         total=total_posts,
         page=skip // limit + 1,
-        size=min(limit, total_posts)
+        size=min(limit, total_posts),
     )
 
 
@@ -154,12 +163,12 @@ async def delete_any_post(
 ) -> None:
     """
     Delete any post (admin only).
-    
+
     Args:
         post_id: ID of the post to delete
         db: Database session
         current_admin: Current admin user (from dependency)
-        
+
     Returns:
         None
     """

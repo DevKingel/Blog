@@ -36,8 +36,8 @@ async def get_current_user(token: str, db: AsyncSession = Depends(get_session)) 
         if user_id is None:
             raise credentials_exception
         user_id = UUID(user_id)
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        raise credentials_exception from e
 
     user = await get_user_by_id(db, user_id)
     if user is None:

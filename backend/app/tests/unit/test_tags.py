@@ -28,15 +28,16 @@ async def test_create_tag_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD functions
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug") as mock_get_by_name_or_slug, \
-         patch("app.api.v1.endpoints.tags.tag_crud.create_tag") as mock_create_tag:
-
+    with (
+        patch(
+            "app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug"
+        ) as mock_get_by_name_or_slug,
+        patch("app.api.v1.endpoints.tags.tag_crud.create_tag") as mock_create_tag,
+    ):
         # Configure mocks
         mock_get_by_name_or_slug.return_value = None  # No existing tag
         mock_create_tag.return_value = Tag(
-            id=uuid.uuid4(),
-            name="Python",
-            slug="python"
+            id=uuid.uuid4(), name="Python", slug="python"
         )
 
         # Call the endpoint
@@ -46,7 +47,9 @@ async def test_create_tag_success():
         assert isinstance(result, Tag)
         assert result.name == "Python"
         assert result.slug == "python"
-        mock_get_by_name_or_slug.assert_called_once_with(mock_db, name="Python", slug="python")
+        mock_get_by_name_or_slug.assert_called_once_with(
+            mock_db, name="Python", slug="python"
+        )
         mock_create_tag.assert_called_once()
 
 
@@ -60,12 +63,12 @@ async def test_create_tag_duplicate_name():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD function to return an existing tag
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug") as mock_get_by_name_or_slug:
+    with patch(
+        "app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug"
+    ) as mock_get_by_name_or_slug:
         # Configure mock to return an existing tag
         mock_get_by_name_or_slug.return_value = Tag(
-            id=uuid.uuid4(),
-            name="Python",
-            slug="python-old"
+            id=uuid.uuid4(), name="Python", slug="python-old"
         )
 
         # Call the endpoint and expect HTTPException
@@ -75,7 +78,9 @@ async def test_create_tag_duplicate_name():
         # Assertions
         assert exc_info.value.status_code == 400
         assert "already exists" in exc_info.value.detail
-        mock_get_by_name_or_slug.assert_called_once_with(mock_db, name="Python", slug="python")
+        mock_get_by_name_or_slug.assert_called_once_with(
+            mock_db, name="Python", slug="python"
+        )
 
 
 @pytest.mark.asyncio
@@ -88,12 +93,12 @@ async def test_create_tag_duplicate_slug():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD function to return an existing tag
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug") as mock_get_by_name_or_slug:
+    with patch(
+        "app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug"
+    ) as mock_get_by_name_or_slug:
         # Configure mock to return an existing tag with same slug
         mock_get_by_name_or_slug.return_value = Tag(
-            id=uuid.uuid4(),
-            name="Python",
-            slug="python"
+            id=uuid.uuid4(), name="Python", slug="python"
         )
 
         # Call the endpoint and expect HTTPException
@@ -103,7 +108,9 @@ async def test_create_tag_duplicate_slug():
         # Assertions
         assert exc_info.value.status_code == 400
         assert "already exists" in exc_info.value.detail
-        mock_get_by_name_or_slug.assert_called_once_with(mock_db, name="Python Programming", slug="python")
+        mock_get_by_name_or_slug.assert_called_once_with(
+            mock_db, name="Python Programming", slug="python"
+        )
 
 
 @pytest.mark.asyncio
@@ -164,7 +171,9 @@ async def test_read_tag_by_id_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD function
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id:
+    with patch(
+        "app.api.v1.endpoints.tags.tag_crud.get_tag_by_id"
+    ) as mock_get_tag_by_id:
         mock_get_tag_by_id.return_value = mock_tag
 
         # Call the endpoint
@@ -187,7 +196,9 @@ async def test_read_tag_by_id_not_found():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD function to return None
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id:
+    with patch(
+        "app.api.v1.endpoints.tags.tag_crud.get_tag_by_id"
+    ) as mock_get_tag_by_id:
         mock_get_tag_by_id.return_value = None
 
         # Call the endpoint and expect HTTPException
@@ -215,10 +226,13 @@ async def test_update_tag_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD functions
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id, \
-         patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug") as mock_get_by_name_or_slug, \
-         patch("app.api.v1.endpoints.tags.tag_crud.update_tag") as mock_update_tag:
-
+    with (
+        patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id,
+        patch(
+            "app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug"
+        ) as mock_get_by_name_or_slug,
+        patch("app.api.v1.endpoints.tags.tag_crud.update_tag") as mock_update_tag,
+    ):
         # Configure mocks
         mock_get_tag_by_id.return_value = existing_tag
         mock_get_by_name_or_slug.return_value = None  # No conflicts
@@ -232,7 +246,9 @@ async def test_update_tag_success():
         assert result.name == "Python 3"
         assert result.slug == "python"
         mock_get_tag_by_id.assert_called_once_with(mock_db, tag_id=tag_id)
-        mock_get_by_name_or_slug.assert_called_once_with(mock_db, name="Python 3", slug="python")
+        mock_get_by_name_or_slug.assert_called_once_with(
+            mock_db, name="Python 3", slug="python"
+        )
         mock_update_tag.assert_called_once()
 
 
@@ -247,7 +263,9 @@ async def test_update_tag_not_found():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD function to return None
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id:
+    with patch(
+        "app.api.v1.endpoints.tags.tag_crud.get_tag_by_id"
+    ) as mock_get_tag_by_id:
         mock_get_tag_by_id.return_value = None
 
         # Call the endpoint and expect HTTPException
@@ -275,12 +293,17 @@ async def test_update_tag_duplicate_name():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD functions
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id, \
-         patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug") as mock_get_by_name_or_slug:
-
+    with (
+        patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id,
+        patch(
+            "app.api.v1.endpoints.tags.tag_crud.get_tag_by_name_or_slug"
+        ) as mock_get_by_name_or_slug,
+    ):
         # Configure mocks
         mock_get_tag_by_id.return_value = existing_tag
-        mock_get_by_name_or_slug.return_value = conflicting_tag  # Conflict with existing tag
+        mock_get_by_name_or_slug.return_value = (
+            conflicting_tag  # Conflict with existing tag
+        )
 
         # Call the endpoint and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
@@ -290,7 +313,9 @@ async def test_update_tag_duplicate_name():
         assert exc_info.value.status_code == 400
         assert "already exists" in exc_info.value.detail
         mock_get_tag_by_id.assert_called_once_with(mock_db, tag_id=tag_id)
-        mock_get_by_name_or_slug.assert_called_once_with(mock_db, name="JavaScript", slug="python")
+        mock_get_by_name_or_slug.assert_called_once_with(
+            mock_db, name="JavaScript", slug="python"
+        )
 
 
 @pytest.mark.asyncio
@@ -352,9 +377,10 @@ async def test_get_posts_with_tag_success():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD functions
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id, \
-         patch("app.api.v1.endpoints.tags.get_posts_by_tag") as mock_get_posts_by_tag:
-
+    with (
+        patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id,
+        patch("app.api.v1.endpoints.tags.get_posts_by_tag") as mock_get_posts_by_tag,
+    ):
         # Configure mocks
         mock_get_tag_by_id.return_value = mock_tag
         mock_get_posts_by_tag.return_value = mock_posts
@@ -380,7 +406,9 @@ async def test_get_posts_with_tag_not_found():
     mock_db = AsyncMock(spec=AsyncSession)
 
     # Mock the tag CRUD function to return None
-    with patch("app.api.v1.endpoints.tags.tag_crud.get_tag_by_id") as mock_get_tag_by_id:
+    with patch(
+        "app.api.v1.endpoints.tags.tag_crud.get_tag_by_id"
+    ) as mock_get_tag_by_id:
         mock_get_tag_by_id.return_value = None
 
         # Call the endpoint and expect HTTPException

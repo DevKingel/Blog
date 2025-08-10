@@ -24,11 +24,7 @@ async def db_session():
 @pytest.fixture
 async def test_tag(db_session: AsyncSession):
     """Create a test tag."""
-    tag = Tag(
-        id=uuid.uuid4(),
-        name="Python",
-        slug="python"
-    )
+    tag = Tag(id=uuid.uuid4(), name="Python", slug="python")
     db_session.add(tag)
     await db_session.commit()
     await db_session.refresh(tag)
@@ -49,14 +45,14 @@ async def test_posts_with_tag(db_session: AsyncSession, test_tag: Tag):
         title="Python Tips",
         content="Some useful Python tips",
         author_id=uuid.uuid4(),  # Assuming there's a default author
-        category_id=uuid.uuid4()  # Assuming there's a default category
+        category_id=uuid.uuid4(),  # Assuming there's a default category
     )
     post2 = Post(
         id=uuid.uuid4(),
         title="Advanced Python",
         content="Advanced Python concepts",
         author_id=uuid.uuid4(),
-        category_id=uuid.uuid4()
+        category_id=uuid.uuid4(),
     )
 
     db_session.add_all([post1, post2])
@@ -84,10 +80,7 @@ async def test_posts_with_tag(db_session: AsyncSession, test_tag: Tag):
 # Integration tests for POST /tags/ - Create a new tag
 def test_create_tag_success():
     """Test successful tag creation."""
-    tag_data = {
-        "name": "JavaScript",
-        "slug": "javascript"
-    }
+    tag_data = {"name": "JavaScript", "slug": "javascript"}
 
     response = client.post("/api/v1/tags/", json=tag_data)
 
@@ -101,10 +94,7 @@ def test_create_tag_success():
 def test_create_tag_duplicate_name():
     """Test tag creation with duplicate name."""
     # First, create a tag
-    tag_data = {
-        "name": "Python",
-        "slug": "python"
-    }
+    tag_data = {"name": "Python", "slug": "python"}
     client.post("/api/v1/tags/", json=tag_data)
 
     # Try to create another tag with the same name
@@ -117,17 +107,11 @@ def test_create_tag_duplicate_name():
 def test_create_tag_duplicate_slug():
     """Test tag creation with duplicate slug."""
     # First, create a tag
-    tag_data1 = {
-        "name": "Python",
-        "slug": "python"
-    }
+    tag_data1 = {"name": "Python", "slug": "python"}
     client.post("/api/v1/tags/", json=tag_data1)
 
     # Try to create another tag with the same slug but different name
-    tag_data2 = {
-        "name": "Python Programming",
-        "slug": "python"
-    }
+    tag_data2 = {"name": "Python Programming", "slug": "python"}
     response = client.post("/api/v1/tags/", json=tag_data2)
 
     assert response.status_code == 400
@@ -243,10 +227,9 @@ async def test_update_tag_duplicate_name(db_session: AsyncSession):
     tag_data1 = {"name": "Python", "slug": "python"}
     tag_data2 = {"name": "JavaScript", "slug": "javascript"}
 
-    response1 = client.post("/api/v1/tags/", json=tag_data1)
+    client.post("/api/v1/tags/", json=tag_data1)
     response2 = client.post("/api/v1/tags/", json=tag_data2)
 
-    tag1_id = response1.json()["id"]
     tag2_id = response2.json()["id"]
 
     # Try to update tag2 to have the same name as tag1
@@ -298,9 +281,7 @@ def test_delete_tag_not_found():
 
 # Integration tests for GET /tags/{tag_id}/posts - Get all posts with a specific tag
 async def test_get_posts_with_tag_success(
-    db_session: AsyncSession,
-    test_tag: Tag,
-    test_posts_with_tag: list[Post]
+    db_session: AsyncSession, test_tag: Tag, test_posts_with_tag: list[Post]
 ):
     """Test successful retrieval of posts with a specific tag."""
     response = client.get(f"/api/v1/tags/{test_tag.id}/posts")

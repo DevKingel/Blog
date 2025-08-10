@@ -1,14 +1,18 @@
 import uuid
 
+from fastapi import Depends
 from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.db.session import get_session
 from app.models.comment import Comment
 
 
-async def create_comment(db: AsyncSession, comment: Comment) -> Comment:
+async def create_comment(
+    comment: Comment, db: AsyncSession = Depends(get_session)
+) -> Comment:
     """
     Create a new comment.
 
@@ -25,7 +29,9 @@ async def create_comment(db: AsyncSession, comment: Comment) -> Comment:
     return comment
 
 
-async def get_comment_by_id(db: AsyncSession, comment_id: uuid.UUID) -> Comment | None:
+async def get_comment_by_id(
+    comment_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> Comment | None:
     """
     Get a comment by its ID.
 
@@ -62,7 +68,9 @@ async def get_all_comments(db: AsyncSession) -> list[Comment]:
     return result.scalars().all()
 
 
-async def get_comments_by_post(db: AsyncSession, post_id: uuid.UUID) -> list[Comment]:
+async def get_comments_by_post(
+    post_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> list[Comment]:
     """
     Get all comments for a specific post.
 
@@ -82,7 +90,9 @@ async def get_comments_by_post(db: AsyncSession, post_id: uuid.UUID) -> list[Com
     return result.scalars().all()
 
 
-async def get_comments_by_user(db: AsyncSession, user_id: uuid.UUID) -> list[Comment]:
+async def get_comments_by_user(
+    user_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> list[Comment]:
     """
     Get all comments by a specific user.
 
@@ -102,7 +112,9 @@ async def get_comments_by_user(db: AsyncSession, user_id: uuid.UUID) -> list[Com
     return result.scalars().all()
 
 
-async def get_replies_by_comment(db: AsyncSession, comment_id: uuid.UUID) -> list[Comment]:
+async def get_replies_by_comment(
+    comment_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> list[Comment]:
     """
     Get all replies to a specific comment.
 
@@ -122,7 +134,9 @@ async def get_replies_by_comment(db: AsyncSession, comment_id: uuid.UUID) -> lis
     return result.scalars().all()
 
 
-async def update_comment(db: AsyncSession, comment_id: uuid.UUID, comment_data: dict) -> Comment | None:
+async def update_comment(
+    comment_id: uuid.UUID, comment_data: dict, db: AsyncSession = Depends(get_session)
+) -> Comment | None:
     """
     Update a comment.
 
@@ -134,17 +148,17 @@ async def update_comment(db: AsyncSession, comment_id: uuid.UUID, comment_data: 
     Returns:
         Optional[Comment]: The updated comment object, or None if not found.
     """
-    statement = (
-        update(Comment).where(Comment.id == comment_id).values(**comment_data)
-    )
+    statement = update(Comment).where(Comment.id == comment_id).values(**comment_data)
     result = await db.execute(statement)
     if result.rowcount == 0:
         return None
     await db.commit()
-    return await get_comment_by_id(db, comment_id)
+    return await get_comment_by_id(comment_id, db)
 
 
-async def delete_comment(db: AsyncSession, comment_id: uuid.UUID) -> bool:
+async def delete_comment(
+    comment_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> bool:
     """
     Delete a comment.
 

@@ -49,7 +49,9 @@ async def test_login_success():
         # Assertions
         assert result.access_token == "fake_access_token"
         assert result.token_type == "bearer"
-        mock_authenticate.assert_called_once_with(mock_db, "test@example.com", "password123")
+        mock_authenticate.assert_called_once_with(
+            mock_db, "test@example.com", "password123"
+        )
         mock_create_token.assert_called_once()
 
 
@@ -74,7 +76,9 @@ async def test_login_invalid_credentials():
         assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
         assert exc_info.value.detail == "Incorrect email or password"
         assert "WWW-Authenticate" in exc_info.value.headers
-        mock_authenticate.assert_called_once_with(mock_db, "test@example.com", "wrongpassword")
+        mock_authenticate.assert_called_once_with(
+            mock_db, "test@example.com", "wrongpassword"
+        )
 
 
 @pytest.mark.asyncio
@@ -122,7 +126,9 @@ async def test_forgot_password_success():
     result = await forgot_password(forgot_data=forgot_data, db=mock_db)
 
     # Assertions
-    assert result["message"] == "If the email exists, a password reset link has been sent"
+    assert (
+        result["message"] == "If the email exists, a password reset link has been sent"
+    )
 
 
 @pytest.mark.asyncio
@@ -138,20 +144,26 @@ async def test_forgot_password_user_not_found():
     result = await forgot_password(forgot_data=forgot_data, db=mock_db)
 
     # Assertions
-    assert result["message"] == "If the email exists, a password reset link has been sent"
+    assert (
+        result["message"] == "If the email exists, a password reset link has been sent"
+    )
 
 
 @pytest.mark.asyncio
 async def test_reset_password_success():
     """Test successful password reset."""
     # Mock request data
-    reset_data = ResetPasswordRequest(token="fake_reset_token", new_password="newpassword123")
+    reset_data = ResetPasswordRequest(
+        token="fake_reset_token", new_password="newpassword123"
+    )
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the verify_password_reset_token function
-    with patch("app.api.v1.endpoints.auth.verify_password_reset_token") as mock_verify_token:
+    with patch(
+        "app.api.v1.endpoints.auth.verify_password_reset_token"
+    ) as mock_verify_token:
         mock_verify_token.return_value = "test@example.com"
 
         # Call the endpoint
@@ -166,13 +178,17 @@ async def test_reset_password_success():
 async def test_reset_password_invalid_token():
     """Test password reset with invalid token."""
     # Mock request data
-    reset_data = ResetPasswordRequest(token="invalid_token", new_password="newpassword123")
+    reset_data = ResetPasswordRequest(
+        token="invalid_token", new_password="newpassword123"
+    )
 
     # Mock dependencies
     mock_db = AsyncMock()
 
     # Mock the verify_password_reset_token function to return None
-    with patch("app.api.v1.endpoints.auth.verify_password_reset_token") as mock_verify_token:
+    with patch(
+        "app.api.v1.endpoints.auth.verify_password_reset_token"
+    ) as mock_verify_token:
         mock_verify_token.return_value = None
 
         # Verify that the exception is raised

@@ -1,17 +1,20 @@
 import uuid
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
+from app.db.session import get_session
 from app.models.media import Media
 from app.schemas.media import MediaCreate, MediaUpdate
 
 
-async def create_media(db: AsyncSession, media: MediaCreate, user_id: UUID) -> Media:
+async def create_media(
+    media: MediaCreate, user_id: UUID, db: AsyncSession = Depends(get_session)
+) -> Media:
     """
     Create a new media entry in the database.
 
@@ -30,7 +33,9 @@ async def create_media(db: AsyncSession, media: MediaCreate, user_id: UUID) -> M
     return db_media
 
 
-async def get_media_by_id(db: AsyncSession, media_id: uuid.UUID) -> Media | None:
+async def get_media_by_id(
+    media_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> Media | None:
     """
     Get a media entry by its ID.
 
@@ -41,11 +46,7 @@ async def get_media_by_id(db: AsyncSession, media_id: uuid.UUID) -> Media | None
     Returns:
         Optional[Media]: Retrieved media object or None if not found.
     """
-    query = (
-        select(Media)
-        .where(Media.id == media_id)
-        .options(selectinload(Media.user))
-    )
+    query = select(Media).where(Media.id == media_id).options(selectinload(Media.user))
     result = await db.execute(query)
     media = result.scalars().first()
     if not media:
@@ -54,7 +55,7 @@ async def get_media_by_id(db: AsyncSession, media_id: uuid.UUID) -> Media | None
 
 
 async def get_all_media(
-    db: AsyncSession, *, skip: int = 0, limit: int = 100
+    *, skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_session)
 ) -> tuple[list[Media], int]:
     """
     Get all media entries with pagination.
@@ -84,7 +85,11 @@ async def get_all_media(
 
 
 async def get_media_by_user(
-    db: AsyncSession, user_id: uuid.UUID, *, skip: int = 0, limit: int = 100
+    user_id: uuid.UUID,
+    *,
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_session),
 ) -> tuple[list[Media], int]:
     """
     Get all media entries for a specific user with pagination.
@@ -100,9 +105,7 @@ async def get_media_by_user(
     """
     # Create the query for media entries
     query = (
-        select(Media)
-        .where(Media.user_id == user_id)
-        .options(selectinload(Media.user))
+        select(Media).where(Media.user_id == user_id).options(selectinload(Media.user))
     )
 
     # Get total count
@@ -119,7 +122,9 @@ async def get_media_by_user(
 
 
 async def update_media(
-    db: AsyncSession, media_id: uuid.UUID, updated_media: MediaUpdate
+    media_id: uuid.UUID,
+    updated_media: MediaUpdate,
+    db: AsyncSession = Depends(get_session),
 ) -> Media | None:
     """
     Update a media entry by its ID.
@@ -132,11 +137,7 @@ async def update_media(
     Returns:
         Optional[Media]: Updated media object or None if not found.
     """
-    query = (
-        select(Media)
-        .where(Media.id == media_id)
-        .options(selectinload(Media.user))
-    )
+    query = select(Media).where(Media.id == media_id).options(selectinload(Media.user))
     result = await db.execute(query)
     media = result.scalars().first()
     if not media:
@@ -148,7 +149,9 @@ async def update_media(
     return media
 
 
-async def delete_media(db: AsyncSession, media_id: uuid.UUID) -> bool:
+async def delete_media(
+    media_id: uuid.UUID, db: AsyncSession = Depends(get_session)
+) -> bool:
     """
     Delete a media entry by its ID.
 
@@ -159,11 +162,7 @@ async def delete_media(db: AsyncSession, media_id: uuid.UUID) -> bool:
     Returns:
         bool: True if the media was deleted, False if not found.
     """
-    query = (
-        select(Media)
-        .where(Media.id == media_id)
-        .options(selectinload(Media.user))
-    )
+    query = select(Media).where(Media.id == media_id).options(selectinload(Media.user))
     result = await db.execute(query)
     media = result.scalars().first()
     if not media:

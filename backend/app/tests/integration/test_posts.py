@@ -64,7 +64,9 @@ async def test_user(db_session: AsyncSession) -> User:
 async def test_category(db_session: AsyncSession) -> Category:
     """Create a test category."""
     # Check if test category already exists
-    result = await db_session.execute(select(Category).where(Category.name == "Test Category"))
+    result = await db_session.execute(
+        select(Category).where(Category.name == "Test Category")
+    )
     test_category = result.scalar_one_or_none()
 
     if not test_category:
@@ -82,7 +84,9 @@ async def test_category(db_session: AsyncSession) -> Category:
 
 
 @pytest.fixture
-async def test_post(db_session: AsyncSession, test_user: User, test_category: Category) -> Post:
+async def test_post(
+    db_session: AsyncSession, test_user: User, test_category: Category
+) -> Post:
     """Create a test post."""
     # Check if test post already exists
     result = await db_session.execute(select(Post).where(Post.title == "Test Post"))
@@ -107,10 +111,14 @@ async def test_post(db_session: AsyncSession, test_user: User, test_category: Ca
 
 
 @pytest.fixture
-async def published_post(db_session: AsyncSession, test_user: User, test_category: Category) -> Post:
+async def published_post(
+    db_session: AsyncSession, test_user: User, test_category: Category
+) -> Post:
     """Create a published test post."""
     # Check if published post already exists
-    result = await db_session.execute(select(Post).where(Post.title == "Published Post"))
+    result = await db_session.execute(
+        select(Post).where(Post.title == "Published Post")
+    )
     published_post = result.scalar_one_or_none()
 
     if not published_post:
@@ -193,7 +201,9 @@ def test_create_new_post_unauthorized():
 
 
 # Integration tests for PUT /{post_id} - Update an existing post
-def test_update_existing_post_success(test_user: User, test_category: Category, test_post: Post):
+def test_update_existing_post_success(
+    test_user: User, test_category: Category, test_post: Post
+):
     """Test successful update of an existing post."""
     # Create auth token for test user
     token = create_test_token(test_user.id)
