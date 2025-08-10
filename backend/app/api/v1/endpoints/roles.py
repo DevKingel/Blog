@@ -155,7 +155,7 @@ async def delete_role_by_id(
     *,
     role_id: uuid.UUID,
     db: AsyncSession = Depends(get_session),
-) -> Any:
+):
     """
     Delete a role.
 
@@ -172,4 +172,3 @@ async def delete_role_by_id(
         raise HTTPException(status_code=404, detail="Role not found") from HTTPException
 
     await delete_role(role_id)
-    return None
