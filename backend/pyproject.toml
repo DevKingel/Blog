@@ -46,7 +46,7 @@ exclude = ["venv", ".venv", "alembic"]
 line-length = 88  # Match black default
 indent-width = 4
 target-version = "py313"  # Set this to your Python version
-exclude = ["alembic"]
+exclude = ["alembic", ".venv"]
 
 [tool.ruff.lint]
 # Allow autofix of certain rules
@@ -63,6 +63,9 @@ quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
 skip-magic-trailing-comma = false
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query", "fastapi.File", "fastapi.params.File"]
 
 [tool.pytest.ini_options]
 testpaths = ["app/tests"]
