@@ -201,8 +201,10 @@ async def test_read_user_by_id_success():
     mock_db = AsyncMock()
 
     # Mock the user CRUD function
-    with patch("app.api.v1.endpoints.users.user_crud.get_user") as mock_get_user:
-        mock_get_user.return_value = mock_user
+    with patch(
+        "app.api.v1.endpoints.users.user_crud.get_user_by_id"
+    ) as mock_get_user_by_id:
+        mock_get_user_by_id.return_value = mock_user
 
         # Call the endpoint
         result = await read_user_by_id(user_id=user_id, db=mock_db)
@@ -210,7 +212,7 @@ async def test_read_user_by_id_success():
         # Assertions
         assert result.id == user_id
         assert result.username == "testuser"
-        mock_get_user.assert_called_once_with(mock_db, user_id=user_id)
+        mock_get_user_by_id.assert_called_once_with(mock_db, user_id=user_id)
 
 
 @pytest.mark.asyncio
@@ -223,8 +225,10 @@ async def test_read_user_by_id_not_found():
     mock_db = AsyncMock()
 
     # Mock the user CRUD function to return None
-    with patch("app.api.v1.endpoints.users.user_crud.get_user") as mock_get_user:
-        mock_get_user.return_value = None
+    with patch(
+        "app.api.v1.endpoints.users.user_crud.get_user_by_id"
+    ) as mock_get_user_by_id:
+        mock_get_user_by_id.return_value = None
 
         # Call the endpoint and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
@@ -233,7 +237,7 @@ async def test_read_user_by_id_not_found():
         # Assertions
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         assert "not found" in exc_info.value.detail
-        mock_get_user.assert_called_once_with(mock_db, user_id=user_id)
+        mock_get_user_by_id.assert_called_once_with(mock_db, user_id=user_id)
 
 
 @pytest.mark.asyncio
@@ -262,10 +266,12 @@ async def test_update_user_success():
 
     # Mock the user CRUD functions
     with (
-        patch("app.api.v1.endpoints.users.user_crud.get_user") as mock_get_user,
+        patch(
+            "app.api.v1.endpoints.users.user_crud.get_user_by_id"
+        ) as mock_get_user_by_id,
         patch("app.api.v1.endpoints.users.user_crud.update_user") as mock_update_user,
     ):
-        mock_get_user.return_value = existing_user
+        mock_get_user_by_id.return_value = existing_user
         mock_update_user.return_value = updated_user
 
         # Call the endpoint
@@ -275,7 +281,7 @@ async def test_update_user_success():
 
         # Assertions
         assert result.username == "updateduser"
-        mock_get_user.assert_called_once_with(mock_db, user_id=user_id)
+        mock_get_user_by_id.assert_called_once_with(mock_db, user_id=user_id)
         mock_update_user.assert_called_once()
 
 
@@ -291,10 +297,12 @@ async def test_update_user_not_found():
 
     # Mock the user CRUD function to return None
     with (
-        patch("app.api.v1.endpoints.users.user_crud.get_user") as mock_get_user,
+        patch(
+            "app.api.v1.endpoints.users.user_crud.get_user_by_id"
+        ) as mock_get_user_by_id,
         patch("app.api.v1.endpoints.users.user_crud.update_user") as mock_update_user,
     ):
-        mock_get_user.return_value = None
+        mock_get_user_by_id.return_value = None
 
         # Call the endpoint and expect HTTPException
         with pytest.raises(HTTPException) as exc_info:
@@ -303,7 +311,7 @@ async def test_update_user_not_found():
         # Assertions
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         assert "does not exist" in exc_info.value.detail
-        mock_get_user.assert_called_once_with(mock_db, user_id=user_id)
+        mock_get_user_by_id.assert_called_once_with(mock_db, user_id=user_id)
         mock_update_user.assert_not_called()
 
 
@@ -326,10 +334,12 @@ async def test_update_user_invalid_data():
 
     # Mock the user CRUD functions
     with (
-        patch("app.api.v1.endpoints.users.user_crud.get_user") as mock_get_user,
+        patch(
+            "app.api.v1.endpoints.users.user_crud.get_user_by_id"
+        ) as mock_get_user_by_id,
         patch("app.api.v1.endpoints.users.user_crud.update_user") as mock_update_user,
     ):
-        mock_get_user.return_value = existing_user
+        mock_get_user_by_id.return_value = existing_user
         mock_update_user.side_effect = Exception("Validation error")
 
         # Call the endpoint and expect exception

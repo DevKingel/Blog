@@ -70,7 +70,7 @@ async def read_user_by_id(
     Get a specific user by id.
     """
     try:
-        user = await user_crud.get_user(db, user_id=user_id)
+        user = await user_crud.get_user_by_id(db, user_id=user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return user
@@ -94,7 +94,7 @@ async def update_existing_user(
     Update a user.
     """
     try:
-        db_user = await user_crud.get_user(db, user_id=user_id)
+        db_user = await user_crud.get_user_by_id(db, user_id=user_id)
         if not db_user:
             raise HTTPException(
                 status_code=404,
