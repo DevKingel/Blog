@@ -104,7 +104,7 @@ async def update_comment_by_id(
             raise HTTPException(status_code=404, detail="Comment not found")
 
         # Update the comment with the new data
-        update_data = comment_in.dict(exclude_unset=True)
+        update_data = comment_in.model_dump(exclude_unset=True)
         updated_comment = await comment_crud.update_comment(
             db, comment_id=comment_id, comment_data=update_data
         )

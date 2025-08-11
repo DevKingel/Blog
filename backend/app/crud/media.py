@@ -26,7 +26,7 @@ async def create_media(
     Returns:
         Media: Created media object.
     """
-    db_media = Media(**media.dict(), user_id=user_id)
+    db_media = Media(**media.model_dump(), user_id=user_id)
     db.add(db_media)
     await db.commit()
     await db.refresh(db_media)
@@ -142,7 +142,7 @@ async def update_media(
     media = result.scalars().first()
     if not media:
         raise HTTPException(status_code=404, detail="Media not found")
-    for key, value in updated_media.dict(exclude_unset=True).items():
+    for key, value in updated_media.model_dump(exclude_unset=True).items():
         setattr(media, key, value)
     await db.commit()
     await db.refresh(media)

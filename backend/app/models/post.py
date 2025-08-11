@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
@@ -24,9 +24,9 @@ class Post(SQLModel, table=True):
     title: str = Field(max_length=255, nullable=False)
     content: str
     is_published: bool = Field(default=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    published_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    published_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     # Relationships
     author: Optional["User"] = Relationship(back_populates="posts")

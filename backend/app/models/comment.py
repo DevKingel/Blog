@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
@@ -17,8 +17,8 @@ class Comment(SQLModel, table=True):
     post_id: UUID = Field(foreign_key="posts.id")
     parent_comment_id: UUID | None = Field(default=None, foreign_key="comments.id")
     content: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     # Relationships
     user: Optional["User"] = Relationship(back_populates="comments")

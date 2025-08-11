@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -41,8 +41,8 @@ async def test_create_new_post_success():
         title=post_data.title,
         content=post_data.content,
         is_published=post_data.is_published,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -129,8 +129,8 @@ async def test_update_existing_post_success():
         title="Original Title",
         content="Original content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -209,8 +209,8 @@ async def test_update_existing_post_invalid_data():
         title="Original Title",
         content="Original content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -254,8 +254,8 @@ async def test_update_existing_post_db_error():
         title="Original Title",
         content="Original content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -292,8 +292,8 @@ async def test_delete_post_by_id_success():
         title="Test Post",
         content="Test content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -355,8 +355,8 @@ async def test_delete_post_by_id_db_error():
         title="Test Post",
         content="Test content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -389,8 +389,8 @@ async def test_read_draft_posts_success():
             title="Draft Post 1",
             content="Content 1",
             is_published=False,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         ),
         Post(
             id=uuid.uuid4(),
@@ -400,8 +400,8 @@ async def test_read_draft_posts_success():
             title="Draft Post 2",
             content="Content 2",
             is_published=False,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         ),
     ]
 
@@ -472,9 +472,9 @@ async def test_read_published_posts_success():
             title="Published Post 1",
             content="Content 1",
             is_published=True,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            published_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+            published_at=datetime.now(UTC),
         ),
         Post(
             id=uuid.uuid4(),
@@ -484,9 +484,9 @@ async def test_read_published_posts_success():
             title="Published Post 2",
             content="Content 2",
             is_published=True,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
-            published_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+            published_at=datetime.now(UTC),
         ),
     ]
 
@@ -562,8 +562,8 @@ async def test_publish_post_success():
         title="Draft Post",
         content="Content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -632,9 +632,9 @@ async def test_publish_post_already_published():
         title="Published Post",
         content="Content",
         is_published=True,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
-        published_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+        published_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -666,8 +666,8 @@ async def test_publish_post_db_error():
         title="Draft Post",
         content="Content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -704,9 +704,9 @@ async def test_unpublish_post_success():
         title="Published Post",
         content="Content",
         is_published=True,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
-        published_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+        published_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -775,8 +775,8 @@ async def test_unpublish_post_not_published():
         title="Draft Post",
         content="Content",
         is_published=False,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function
@@ -808,9 +808,9 @@ async def test_unpublish_post_db_error():
         title="Published Post",
         content="Content",
         is_published=True,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
-        published_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+        published_at=datetime.now(UTC),
     )
 
     # Mock the post CRUD function

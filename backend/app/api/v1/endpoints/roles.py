@@ -1,5 +1,4 @@
 import uuid
-from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,7 +42,7 @@ async def create_new_role(
                 detail="The role with this name already exists in the system.",
             )
 
-    role_data = role_in.dict()
+    role_data = role_in.model_dump()
     role = Role(**role_data)
     created_role = await create_role(role)
     return created_role
@@ -106,7 +105,7 @@ async def update_existing_role(
     Returns:
         Role: The updated role.
     """
-    role_data = role_in.dict(exclude_unset=True)
+    role_data = role_in.model_dump(exclude_unset=True)
     if not role_data:
         raise HTTPException(
             status_code=400,

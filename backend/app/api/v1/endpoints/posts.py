@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,7 +24,7 @@ async def create_new_post(
     Create new post.
     """
     try:
-        post = Post(**post_in.dict())
+        post = Post(**post_in.model_dump())
         post = await post_crud.create_post(db, post)
         return post
     except Exception as e:
@@ -53,12 +53,12 @@ async def update_existing_post(
             )
 
         # Update the post with the new data
-        update_data = post_in.dict(exclude_unset=True)
+        update_data = post_in.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_post, key, value)
 
         # Update the updated_at timestamp
-        db_post.updated_at = datetime.utcnow()
+        db_post.updated_at = datetime.now(UTC)
 
         db.add(db_post)
         await db.commit()
@@ -184,8 +184,8 @@ async def publish_post(
 
         # Update the post to published
         db_post.is_published = True
-        db_post.published_at = datetime.utcnow()
-        db_post.updated_at = datetime.utcnow()
+        db_post.published_at = datetime.now(UTC)
+        db_post.updated_at = datetime.now(UTC)
 
         db.add(db_post)
         await db.commit()
@@ -225,7 +225,7 @@ async def unpublish_post(
 
         # Update the post to unpublished
         db_post.is_published = False
-        db_post.updated_at = datetime.utcnow()
+        db_post.updated_at = datetime.now(UTC)
 
         db.add(db_post)
         await db.commit()

@@ -33,7 +33,7 @@ async def create_new_tag(
         )
 
     # Create the tag
-    tag = Tag(**tag_in.dict())
+    tag = Tag(**tag_in.model_dump())
     tag = await tag_crud.create_tag(db, tag=tag)
     return tag
 
@@ -95,7 +95,7 @@ async def update_existing_tag(
             )
 
     # Update the tag
-    tag_data = tag_in.dict(exclude_unset=True)
+    tag_data = tag_in.model_dump(exclude_unset=True)
     tag = await tag_crud.update_tag(db, tag_id=tag_id, tag_update=tag_data)
     return tag
 

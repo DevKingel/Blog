@@ -131,7 +131,7 @@ async def published_post(
             title="Published Post",
             content="This is a published test post",
             is_published=True,
-            published_at=datetime.utcnow(),
+            published_at=datetime.now(UTC),
         )
         db_session.add(published_post)
         await db_session.commit()

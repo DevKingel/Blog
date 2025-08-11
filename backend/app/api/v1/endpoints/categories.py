@@ -43,7 +43,7 @@ async def create_new_category(
                 detail="The category with this slug already exists in the system.",
             )
 
-    category_data = category_in.dict()
+    category_data = category_in.model_dump()
     category = await category_crud.create_category(db, category_data=category_data)
     return category
 
@@ -108,7 +108,7 @@ async def update_existing_category(
     Returns:
         Category: The updated category.
     """
-    category_data = category_in.dict(exclude_unset=True)
+    category_data = category_in.model_dump(exclude_unset=True)
     if not category_data:
         raise HTTPException(
             status_code=400,

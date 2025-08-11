@@ -1,6 +1,7 @@
 __all__ = [
     "Category",
     "Comment",
+    "Media",
     "Post",
     "PostTag",
     "Role",
@@ -12,6 +13,7 @@ __all__ = [
 
 
 from .category import Category
+from .media import Media
 from .comment import Comment
 from .post import Post
 from .post_tag import PostTag

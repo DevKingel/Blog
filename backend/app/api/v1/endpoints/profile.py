@@ -41,7 +41,7 @@ async def update_current_user_profile(
         raise HTTPException(status_code=404, detail="User not found")
 
     # Filter out None values
-    update_data = profile_update.dict(exclude_unset=True)
+    update_data = profile_update.model_dump(exclude_unset=True)
     updated_user = await update_user(db, user_id, update_data)
     if not updated_user:
         raise HTTPException(status_code=404, detail="User not found")

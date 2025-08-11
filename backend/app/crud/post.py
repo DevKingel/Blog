@@ -174,7 +174,7 @@ async def update_post(
     post = result.scalars().first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    for key, value in updated_post.dict(exclude_unset=True).items():
+    for key, value in updated_post.model_dump(exclude_unset=True).items():
         setattr(post, key, value)
     await db.commit()
     await db.refresh(post)
