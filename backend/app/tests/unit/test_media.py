@@ -19,7 +19,8 @@ async def test_upload_media_success():
     mock_file.file = Mock()
     mock_file.file.seek = Mock()
     mock_file.file.tell = Mock(return_value=1024 * 1024)  # 1MB
-    mock_file.read = AsyncMock(return_value=b"fake image data")
+    # Fix the mock to return data only once, then empty bytes to simulate end of file
+    mock_file.read = AsyncMock(side_effect=[b"fake image data", b""])
 
     # Create a mock database session
     mock_db = AsyncMock()
@@ -38,7 +39,9 @@ async def test_upload_media_success():
         )
 
         # Mock file writing
-        with patch("app.api.v1.endpoints.media.open", Mock()):
+        with patch("app.api.v1.endpoints.media.open") as mock_open:
+            mock_file_handle = Mock()
+            mock_open.return_value.__enter__.return_value = mock_file_handle
             # Call the endpoint
             result = await upload_media(file=mock_file, db=mock_db)
 
@@ -106,7 +109,8 @@ async def test_upload_media_db_error():
     mock_file.file = Mock()
     mock_file.file.seek = Mock()
     mock_file.file.tell = Mock(return_value=1024 * 1024)  # 1MB
-    mock_file.read = AsyncMock(return_value=b"fake image data")
+    # Fix the mock to return data only once, then empty bytes to simulate end of file
+    mock_file.read = AsyncMock(side_effect=[b"fake image data", b""])
 
     # Create a mock database session
     mock_db = AsyncMock()
@@ -118,7 +122,9 @@ async def test_upload_media_db_error():
         mock_create_media.side_effect = Exception("Database error")
 
         # Mock file writing
-        with patch("app.api.v1.endpoints.media.open", Mock()):
+        with patch("app.api.v1.endpoints.media.open") as mock_open:
+            mock_file_handle = Mock()
+            mock_open.return_value.__enter__.return_value = mock_file_handle
             # Mock file removal
             with patch("app.api.v1.endpoints.media.os.remove") as mock_remove:
                 # Call the endpoint and expect exception
@@ -146,7 +152,8 @@ async def test_upload_media_file_write_error():
     mock_file.file = Mock()
     mock_file.file.seek = Mock()
     mock_file.file.tell = Mock(return_value=1024 * 1024)  # 1MB
-    mock_file.read = AsyncMock(return_value=b"fake image data")
+    # Fix the mock to return data only once, then empty bytes to simulate end of file
+    mock_file.read = AsyncMock(side_effect=[b"fake image data", b""])
 
     # Create a mock database session
     mock_db = AsyncMock()

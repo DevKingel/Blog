@@ -23,11 +23,8 @@ async def test_get_admin_statistics_success():
     mock_stats_data = {
         "total_users": 100,
         "total_posts": 50,
-        "total_comments": 200,
-        "total_categories": 10,
-        "total_tags": 25,
-        "total_media": 30,
-        "total_roles": 3,
+        "total_views": 1000,
+        "total_likes": 500,
     }
 
     # Mock dependencies
@@ -45,7 +42,8 @@ async def test_get_admin_statistics_success():
         assert isinstance(result, AdminStatsRead)
         assert result.total_users == 100
         assert result.total_posts == 50
-        assert result.total_comments == 200
+        assert result.total_views == 1000
+        assert result.total_likes == 500
         mock_get_stats.assert_called_once_with(mock_db)
 
 
