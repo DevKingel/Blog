@@ -13,8 +13,8 @@ __all__ = [
 
 
 from .category import Category
-from .media import Media
 from .comment import Comment
+from .media import Media
 from .post import Post
 from .post_tag import PostTag
 from .role import Role
