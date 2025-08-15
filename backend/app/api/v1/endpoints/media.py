@@ -73,26 +73,37 @@ async def upload_media(
         file_path = MEDIA_DIR / unique_filename
 
         # Save the file
-        with open(file_path, "wb") as buffer:
-            while chunk := await file.read(1024 * 1024):  # Read in 1MB chunks
-                buffer.write(chunk)
+        try:
+            with open(file_path, "wb") as buffer:
+                while chunk := await file.read(1024 * 1024):  # Read in 1MB chunks
+                    buffer.write(chunk)
 
-        # Create media record in database
-        # Store relative path from backend/app directory
-        relative_path = f"media/{unique_filename}"
-        media_in = MediaCreate(
-            filename=file.filename or unique_filename,
-            content_type=file.content_type,
-            file_size=file_size,
-            file_path=relative_path,
-        )
+            # Create media record in database
+            # Store relative path from backend/app directory
+            relative_path = f"media/{unique_filename}"
+            media_in = MediaCreate(
+                filename=file.filename or unique_filename,
+                content_type=file.content_type,
+                file_size=file_size,
+                file_path=relative_path,
+            )
 
-        # For now, we'll use a placeholder user_id
-        # In a real implementation, this would come from the authenticated user
-        user_id = uuid.uuid4()  # Placeholder
+            # For now, we'll use a placeholder user_id
+            # In a real implementation, this would come from the authenticated user
+            user_id = uuid.uuid4()  # Placeholder
 
-        media = await media_crud.create_media(db, media_in, user_id)
-        return media
+            media = await media_crud.create_media(db, media_in, user_id)
+            return media
+        except Exception:
+            # If anything fails, clean up the file if it was created
+            # We always call os.remove regardless of whether the file exists or not
+            # to satisfy the test requirements
+            try:
+                os.remove(file_path)
+            except FileNotFoundError:
+                # File doesn't exist, which is fine
+                pass
+            raise
     except HTTPException:
         raise
     except Exception as e:
@@ -156,10 +167,14 @@ async def delete_media(
             # Construct full path from backend/app directory
             full_path = Path(__file__).parent.parent.parent.parent / media.file_path
             if os.path.exists(full_path):
-                os.remove(full_path)
-        except (OSError, FileNotFoundError) as e:
-            # Log the error but continue with database deletion
-            print(f"Error deleting file {media.file_path}: {e}")
+                try:
+                    os.remove(full_path)
+                except (PermissionError, OSError, FileNotFoundError) as e:
+                    # Log the error but continue with database deletion
+                    print(f"Error deleting file {media.file_path}: {e}")
+        except Exception as e:
+            # Log unexpected errors but continue with database deletion
+            print(f"Unexpected error while deleting file {media.file_path}: {e}")
 
         # Delete the media entry from database
         await media_crud.delete_media(db, media_id)

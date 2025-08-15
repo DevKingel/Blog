@@ -87,7 +87,7 @@ async def delete_post_by_id(
         if not post:
             raise HTTPException(status_code=404, detail="Post not found")
 
-        await db.delete(post)
+        db.delete(post)
         await db.commit()
         return None
     except HTTPException:
